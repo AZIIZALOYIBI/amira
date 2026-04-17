@@ -10,12 +10,60 @@ class ChessUI {
         this.flipped = false;
         this.timers = { white: 600, black: 600 }; // 10 minutes in seconds
         this.timerInterval = null;
+        this.playerNames = { white: 'اللاعب الأبيض', black: 'اللاعب الأسود' };
+        this.gameMode = 'classic';
 
         this.pieceSymbols = {
             white: { king: '♔', queen: '♕', rook: '♖', bishop: '♗', knight: '♘', pawn: '♙' },
             black: { king: '♚', queen: '♛', rook: '♜', bishop: '♝', knight: '♞', pawn: '♟' }
         };
 
+        this.initSetup();
+    }
+
+    initSetup() {
+        this.attachSetupListeners();
+    }
+
+    attachSetupListeners() {
+        // Game setup modal
+        document.getElementById('startGameBtn').addEventListener('click', () => this.startGame());
+
+        // Mode selection
+        document.querySelectorAll('.mode-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                document.querySelectorAll('.mode-option').forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                this.gameMode = option.dataset.mode;
+            });
+        });
+    }
+
+    startGame() {
+        // Get player names
+        this.playerNames.white = document.getElementById('whitePlayerName').value || 'اللاعب الأبيض';
+        this.playerNames.black = document.getElementById('blackPlayerName').value || 'اللاعب الأسود';
+
+        // Set timer based on game mode
+        const timers = {
+            classic: 600,  // 10 minutes
+            rapid: 300,    // 5 minutes
+            blitz: 180,    // 3 minutes
+            unlimited: 0   // No timer
+        };
+
+        this.timers.white = timers[this.gameMode];
+        this.timers.black = timers[this.gameMode];
+        this.timerEnabled = this.gameMode !== 'unlimited';
+
+        // Update player name displays
+        document.getElementById('whitePlayerNameDisplay').textContent = this.playerNames.white;
+        document.getElementById('blackPlayerNameDisplay').textContent = this.playerNames.black;
+
+        // Hide modal
+        document.getElementById('gameSetupModal').classList.remove('active');
+
+        // Initialize game
         this.init();
     }
 
@@ -23,6 +71,10 @@ class ChessUI {
         this.renderBoard();
         this.attachEventListeners();
         this.updateGameStatus();
+        this.updateTimerDisplay();
+        if (this.timerEnabled) {
+            this.startTimer();
+        }
     }
 
     renderBoard() {
@@ -284,16 +336,17 @@ class ChessUI {
         const currentPlayerElement = document.getElementById('currentPlayer');
         const gameMessageElement = document.getElementById('gameMessage');
 
-        const playerName = this.game.currentPlayer === 'white' ? 'الأبيض' : 'الأسود';
+        const playerName = this.playerNames[this.game.currentPlayer];
         currentPlayerElement.textContent = playerName;
 
         const state = this.game.updateGameState();
 
         if (state === 'checkmate') {
-            const winner = this.game.currentPlayer === 'white' ? 'الأسود' : 'الأبيض';
-            gameMessageElement.textContent = `كش ملك! فاز اللاعب ${winner}`;
+            const winner = this.game.currentPlayer === 'white' ? this.playerNames.black : this.playerNames.white;
+            gameMessageElement.textContent = `كش ملك! فاز ${winner}`;
             this.playSound('checkmate');
             this.stopTimer();
+            this.showVictory(winner, 'بالكش مات');
         } else if (state === 'check') {
             gameMessageElement.textContent = 'كش!';
             this.playSound('check');
@@ -301,9 +354,25 @@ class ChessUI {
             gameMessageElement.textContent = 'تعادل - طريق مسدود';
             this.playSound('stalemate');
             this.stopTimer();
+            this.showVictory('تعادل', 'طريق مسدود');
         } else {
             gameMessageElement.textContent = '';
         }
+    }
+
+    showVictory(winner, reason) {
+        setTimeout(() => {
+            const victoryOverlay = document.getElementById('victoryOverlay');
+            const victoryMessage = document.getElementById('victoryMessage');
+
+            if (winner === 'تعادل') {
+                victoryMessage.textContent = `انتهت اللعبة بالتعادل - ${reason}`;
+            } else {
+                victoryMessage.textContent = `🎉 فاز ${winner} ${reason}! 🎉`;
+            }
+
+            victoryOverlay.classList.add('active');
+        }, 500);
     }
 
     updateCapturedPieces() {
@@ -464,9 +533,10 @@ class ChessUI {
     }
 
     handleTimeout(player) {
-        const winner = player === 'white' ? 'الأسود' : 'الأبيض';
-        document.getElementById('gameMessage').textContent = `انتهى الوقت! فاز اللاعب ${winner}`;
+        const winner = player === 'white' ? this.playerNames.black : this.playerNames.white;
+        document.getElementById('gameMessage').textContent = `انتهى الوقت! فاز ${winner}`;
         this.game.gameOver = true;
+        this.showVictory(winner, 'بانتهاء الوقت');
     }
 
     flipBoard() {
@@ -479,7 +549,7 @@ class ChessUI {
 
     newGame() {
         if (confirm('هل تريد بدء لعبة جديدة؟')) {
-            this.resetGame();
+            location.reload();
         }
     }
 

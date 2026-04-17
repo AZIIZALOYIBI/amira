@@ -169,6 +169,9 @@ amira/
 - **رسوم متحركة سلسة** لجميع العناصر التفاعلية
 - **تجربة مستخدم احترافية** مصممة للعب الثنائي
 
+### صاحب الموقع
+**عبدالعزيز بن سلطان**
+
 ---
 
 **Developed with ❤️ using modern web technologies and luxury design principles**

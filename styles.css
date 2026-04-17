@@ -88,9 +88,9 @@ html {
     --highlight-color: rgba(102, 126, 234, 0.45);
     --valid-move: rgba(118, 75, 162, 0.55);
     --check-color: rgba(239, 68, 68, 0.65);
-    --bg-gradient: linear-gradient(145deg, #1a1f3a 0%, #2d1b4e 40%, #1f0e33 100%);
-    --glass-bg: rgba(255, 255, 255, 0.07);
-    --glass-border: rgba(255, 255, 255, 0.15);
+    --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.18);
     --shadow: 0 8px 32px rgba(102, 126, 234, 0.18), 0 4px 16px rgba(118, 75, 162, 0.12);
     --shadow-hover: 0 16px 48px rgba(102, 126, 234, 0.28), 0 8px 24px rgba(118, 75, 162, 0.18);
     --shadow-active: 0 4px 16px rgba(102, 126, 234, 0.14), 0 2px 8px rgba(118, 75, 162, 0.1);
@@ -861,6 +861,115 @@ header .subtitle {
     animation: slideUpFadeIn 1s ease-out 0.3s backwards;
     font-weight: 500;
     letter-spacing: 1px;
+}
+
+/* ---- Header User Bar & Exit Button ---- */
+.header-user-bar {
+    display: none; /* shown by JS after login */
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 18px;
+    animation: slideUpFadeIn 0.9s ease-out 0.5s backwards;
+}
+
+.header-username {
+    font-size: 0.95em;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 600;
+    padding: 7px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    letter-spacing: 0.3px;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.btn-exit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 20px;
+    background: rgba(220, 53, 69, 0.18);
+    border: 1.5px solid rgba(220, 53, 69, 0.45);
+    color: #ff8a95;
+    border-radius: 999px;
+    font-size: 0.92em;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    letter-spacing: 0.3px;
+    backdrop-filter: blur(10px);
+    transition:
+        background var(--transition-normal),
+        border-color var(--transition-normal),
+        color var(--transition-normal),
+        transform var(--transition-fast),
+        box-shadow var(--transition-normal);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn-exit-icon {
+    font-size: 1.05em;
+    line-height: 1;
+    transition: transform var(--transition-normal);
+}
+
+.btn-exit:hover {
+    background: rgba(220, 53, 69, 0.35);
+    border-color: rgba(220, 53, 69, 0.75);
+    color: #ffffff;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.35), 0 0 30px rgba(220, 53, 69, 0.15);
+}
+
+.btn-exit:hover .btn-exit-icon {
+    transform: rotate(90deg);
+}
+
+.btn-exit:active {
+    transform: scale(0.96) translateY(0);
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+}
+
+.btn-exit:focus-visible {
+    outline: 2px solid rgba(220, 53, 69, 0.8);
+    outline-offset: 3px;
+}
+
+/* Hide the user bar when no user is logged in */
+.header-user-bar:empty,
+.header-user-bar[data-hidden="true"] {
+    display: none;
+}
+
+/* Mobile responsive for user bar */
+@media (max-width: 480px) {
+    .header-user-bar {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .header-username {
+        font-size: 0.85em;
+        padding: 6px 12px;
+        max-width: 160px;
+    }
+
+    .btn-exit {
+        padding: 8px 16px;
+        font-size: 0.85em;
+    }
+
+    .btn-exit-label {
+        display: inline; /* always show label, icon is enough hint */
+    }
 }
 
 .presentation-showcase {
@@ -1689,10 +1798,9 @@ footer .owner-credit strong {
 .game-setup-modal {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;           /* top:0 left:0 right:0 bottom:0 — no height/width needed */
+    width: 100vw;
+    height: 100vh;
     background: rgba(0, 0, 0, 0);
     z-index: 2000;
     justify-content: center;
@@ -1701,30 +1809,26 @@ footer .owner-credit strong {
     -webkit-overflow-scrolling: touch;
     overflow-y: auto;
     transition: background var(--transition-normal) ease-out;
-    backdrop-filter: blur(0px);
 }
 
 .game-setup-modal.active {
     display: flex;
-    background: rgba(0, 0, 0, 0.9);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    background: rgba(0, 0, 0, 0.82);
     animation: fadeIn 0.3s ease-out;
 }
 
 .game-setup-content {
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.08) 100%);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
+    background: linear-gradient(145deg, #3730a3 0%, #4c1d95 60%, #312e81 100%);
     padding: 50px;
     border-radius: var(--border-radius-lg);
     box-shadow:
-        0 20px 60px rgba(102, 126, 234, 0.3),
-        0 0 1px rgba(255, 255, 255, 0.3) inset;
+        0 24px 64px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.18),
+        0 0 80px rgba(102, 126, 234, 0.25);
     max-width: 600px;
     width: 90%;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    animation: slideUpBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    animation: slideUpFadeIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
     transform-origin: center center;
     position: relative;
 }
@@ -1756,8 +1860,7 @@ footer .owner-credit strong {
 .player-setup {
     margin-bottom: 25px;
     padding: 22px;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.25);
     border-radius: var(--border-radius-md);
     border: 1px solid rgba(255, 255, 255, 0.15);
     animation: slideUpFadeIn 0.5s ease-out backwards;
@@ -1864,16 +1967,14 @@ footer .owner-credit strong {
 .victory-overlay {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
     background: rgba(0, 0, 0, 0);
     z-index: 3000;
     justify-content: center;
     align-items: center;
     transition: background var(--transition-slow) ease-out;
-    backdrop-filter: blur(0px);
 }
 
 .victory-overlay.active {

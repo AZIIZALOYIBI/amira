@@ -164,6 +164,10 @@ class ChessAI {
             game.board[move.toRow][move.toCol] = { type: 'queen', color: piece.color };
         }
 
+        // Switch current player for proper move validation during search
+        const opponent = color === 'white' ? 'black' : 'white';
+        game.currentPlayer = opponent;
+
         let value;
 
         // Check if game is over or max depth reached
@@ -171,7 +175,6 @@ class ChessAI {
             value = this.evaluatePosition(game, color);
         } else {
             // Minimax with alpha-beta pruning
-            const opponent = color === 'white' ? 'black' : 'white';
             const opponentMoves = this.getAllPossibleMoves(game, opponent);
 
             if (opponentMoves.length === 0) {

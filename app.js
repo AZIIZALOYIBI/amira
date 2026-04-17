@@ -710,6 +710,9 @@ class ChessUI {
             const bestMove = this.ai.getBestMove(this.game, aiColor);
 
             if (bestMove) {
+                // Set valid moves for the AI's piece before making the move
+                this.game.validMoves = this.game.getValidMoves(bestMove.fromRow, bestMove.fromCol);
+
                 const result = this.game.makeMove(
                     bestMove.fromRow,
                     bestMove.fromCol,

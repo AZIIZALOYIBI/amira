@@ -10,17 +10,73 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Game Setup Modal -->
+    <div class="game-setup-modal active" id="gameSetupModal">
+        <div class="game-setup-content">
+            <h2>♔ إعداد اللعبة ♚</h2>
+
+            <div class="player-setup">
+                <h3>♔ اللاعب الأبيض</h3>
+                <label for="whitePlayerName">اسم اللاعب:</label>
+                <input type="text" id="whitePlayerName" class="player-name-input"
+                       placeholder="أدخل اسم اللاعب الأبيض" value="اللاعب الأبيض">
+            </div>
+
+            <div class="player-setup">
+                <h3>♚ اللاعب الأسود</h3>
+                <label for="blackPlayerName">اسم اللاعب:</label>
+                <input type="text" id="blackPlayerName" class="player-name-input"
+                       placeholder="أدخل اسم اللاعب الأسود" value="اللاعب الأسود">
+            </div>
+
+            <div class="game-mode-selection">
+                <h3>وضع اللعب:</h3>
+                <div class="mode-option selected" data-mode="classic">
+                    <span>كلاسيكي (10 دقائق)</span>
+                    <span>⏱️</span>
+                </div>
+                <div class="mode-option" data-mode="rapid">
+                    <span>سريع (5 دقائق)</span>
+                    <span>⚡</span>
+                </div>
+                <div class="mode-option" data-mode="blitz">
+                    <span>خاطف (3 دقائق)</span>
+                    <span>⚡⚡</span>
+                </div>
+                <div class="mode-option" data-mode="unlimited">
+                    <span>غير محدود</span>
+                    <span>∞</span>
+                </div>
+            </div>
+
+            <button class="start-game-btn" id="startGameBtn">ابدأ اللعبة</button>
+        </div>
+    </div>
+
+    <!-- Victory Overlay -->
+    <div class="victory-overlay" id="victoryOverlay">
+        <div class="victory-content">
+            <div class="trophy">🏆</div>
+            <h2>مبروك!</h2>
+            <p id="victoryMessage"></p>
+            <button class="start-game-btn" onclick="location.reload()">لعبة جديدة</button>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <h1>♔ Amira Chess ♚</h1>
-            <p class="subtitle">لعبة الشطرنج الاحترافية</p>
+            <p class="subtitle">لعبة الشطرنج الفاخرة الاحترافية</p>
         </header>
 
         <div class="game-container">
             <div class="sidebar left-sidebar">
                 <div class="player-info black-player">
                     <div class="player-header">
-                        <h3>اللاعب الأسود</h3>
+                        <div>
+                            <h3>اللاعب الأسود</h3>
+                            <div class="player-name-display" id="blackPlayerNameDisplay">اللاعب الأسود</div>
+                        </div>
                         <div class="timer" id="blackTimer">10:00</div>
                     </div>
                     <div class="captured-pieces" id="blackCaptured"></div>
@@ -69,7 +125,10 @@
             <div class="sidebar right-sidebar">
                 <div class="player-info white-player">
                     <div class="player-header">
-                        <h3>اللاعب الأبيض</h3>
+                        <div>
+                            <h3>اللاعب الأبيض</h3>
+                            <div class="player-name-display" id="whitePlayerNameDisplay">اللاعب الأبيض</div>
+                        </div>
                         <div class="timer" id="whiteTimer">10:00</div>
                     </div>
                     <div class="captured-pieces" id="whiteCaptured"></div>
@@ -83,7 +142,7 @@
         </div>
 
         <footer>
-            <p>تم التطوير باستخدام تقنيات عالية واحترافية</p>
+            <p>تم التطوير باستخدام تقنيات عالية واحترافية ✨ تصميم فاخر للعب الاحترافي</p>
         </footer>
     </div>
 

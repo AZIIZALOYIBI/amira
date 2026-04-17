@@ -2,6 +2,28 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+    .btn, .mode-option, .promotion-piece, .square {
+        cursor: default;
+    }
+
+    .btn:active, .mode-option:active {
+        transform: scale(0.95);
+    }
+
+    .square.selected, .square.valid-move {
+        animation: pulse-mobile 0.5s ease-in-out;
+    }
+}
+
+@keyframes pulse-mobile {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
 :root {
@@ -978,6 +1000,58 @@ footer {
     .trophy {
         font-size: 4em;
     }
+
+    /* Button improvements for mobile */
+    .btn {
+        padding: 12px 18px;
+        font-size: 0.95em;
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    .game-controls {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    /* Statistics modal mobile optimization */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
+    .stat-value {
+        font-size: 1.8em;
+    }
+
+    .stat-label {
+        font-size: 0.85em;
+    }
+
+    /* Theme selector mobile */
+    .theme-select {
+        font-size: 0.95em;
+        padding: 10px;
+    }
+
+    /* Move history mobile */
+    .moves-list {
+        max-height: 200px;
+    }
+
+    /* Player info mobile */
+    .timer {
+        font-size: 1.3em;
+    }
+
+    .player-name-display {
+        font-size: 0.95em;
+    }
 }
 
 @media (max-width: 480px) {
@@ -988,6 +1062,10 @@ footer {
     header h1 {
         font-size: 1.8em;
         letter-spacing: 1px;
+    }
+
+    .subtitle {
+        font-size: 0.85em;
     }
 
     .chess-board {
@@ -1022,6 +1100,7 @@ footer {
     .start-game-btn {
         padding: 12px;
         font-size: 1em;
+        min-height: 44px;
     }
 
     .victory-content {
@@ -1038,6 +1117,223 @@ footer {
 
     .trophy {
         font-size: 3em;
+    }
+
+    /* Enhanced button layout for small screens */
+    .btn {
+        padding: 10px 14px;
+        font-size: 0.85em;
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    .game-controls {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    /* Statistics optimizations for small screens */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .stat-card {
+        padding: 12px;
+    }
+
+    .stat-value {
+        font-size: 1.5em;
+    }
+
+    .stat-label {
+        font-size: 0.8em;
+    }
+
+    .stats-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .stats-buttons .btn {
+        width: 100%;
+    }
+
+    /* Settings mobile */
+    .settings {
+        padding: 15px;
+    }
+
+    .settings h3 {
+        font-size: 1.1em;
+    }
+
+    .switch-label {
+        font-size: 0.9em;
+    }
+
+    .theme-select {
+        font-size: 0.85em;
+        padding: 8px;
+        width: 100%;
+    }
+
+    /* Player info small screen */
+    .player-header {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+
+    .timer {
+        font-size: 1.2em;
+    }
+
+    .player-name-display {
+        font-size: 0.85em;
+    }
+
+    .player-info h3 {
+        font-size: 1.1em;
+    }
+
+    /* Move history small screen */
+    .moves-list {
+        max-height: 150px;
+        font-size: 0.85em;
+    }
+
+    .move-history h3 {
+        font-size: 1.1em;
+    }
+
+    /* Captured pieces */
+    .captured-piece {
+        font-size: 1.3em;
+    }
+
+    /* Game status */
+    .current-turn {
+        font-size: 0.9em;
+    }
+
+    .game-message {
+        font-size: 0.85em;
+    }
+
+    /* Promotion dialog */
+    .promotion-dialog {
+        padding: 20px;
+        max-width: 90%;
+    }
+
+    .promotion-dialog h3 {
+        font-size: 1.1em;
+    }
+
+    .promotion-pieces {
+        gap: 10px;
+    }
+
+    .promotion-piece {
+        width: 60px;
+        height: 60px;
+        font-size: 35px;
+    }
+
+    /* Modal improvements */
+    .game-setup-modal {
+        padding: 10px;
+    }
+
+    .player-name-input {
+        font-size: 0.9em;
+        padding: 10px;
+    }
+
+    /* Footer */
+    footer p {
+        font-size: 0.8em;
+    }
+}
+
+/* Landscape mode for small screens */
+@media (max-width: 768px) and (orientation: landscape) {
+    .chess-board {
+        grid-template-columns: repeat(8, 45px);
+        grid-template-rows: repeat(8, 45px);
+    }
+
+    .square {
+        width: 45px;
+        height: 45px;
+        font-size: 32px;
+    }
+
+    .game-container {
+        gap: 10px;
+    }
+
+    .sidebar {
+        padding: 10px;
+    }
+
+    .player-info {
+        padding: 10px;
+    }
+
+    .moves-list {
+        max-height: 150px;
+    }
+}
+
+/* Extra small screens in landscape */
+@media (max-width: 480px) and (orientation: landscape) {
+    .chess-board {
+        grid-template-columns: repeat(8, 35px);
+        grid-template-rows: repeat(8, 35px);
+    }
+
+    .square {
+        width: 35px;
+        height: 35px;
+        font-size: 25px;
+    }
+
+    header h1 {
+        font-size: 1.5em;
+    }
+
+    .subtitle {
+        display: none;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+    .chess-board {
+        grid-template-columns: repeat(8, 35px);
+        grid-template-rows: repeat(8, 35px);
+    }
+
+    .square {
+        width: 35px;
+        height: 35px;
+        font-size: 25px;
+    }
+
+    header h1 {
+        font-size: 1.5em;
+    }
+
+    .btn {
+        font-size: 0.75em;
+        padding: 8px 12px;
+    }
+
+    .game-controls {
+        gap: 6px;
     }
 }
 

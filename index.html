@@ -2,16 +2,18 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#667eea">
+    <meta name="description" content="Amira Chess — تجربة شطرنج عصرية باللغة العربية مع واجهة مستخدم فاخرة ودعم كامل للجوال">
+    <meta name="color-scheme" content="dark">
     <title>لعبة الشطرنج - Amira Chess</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Load new modules -->
     <script src="puzzles.js" defer></script>
@@ -21,65 +23,65 @@
 </head>
 <body>
     <!-- Login/Registration Modal -->
-    <div class="game-setup-modal active" id="loginModal">
+    <div class="game-setup-modal active" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
         <div class="game-setup-content">
-            <h2>♔ تسجيل الدخول ♚</h2>
+            <h2 id="loginModalTitle">♔ تسجيل الدخول ♚</h2>
 
-            <div class="auth-tabs">
-                <button class="auth-tab active" data-tab="login">تسجيل الدخول</button>
-                <button class="auth-tab" data-tab="register">تسجيل جديد</button>
+            <div class="auth-tabs" role="tablist" aria-label="تبويبات المصادقة">
+                <button class="auth-tab active" data-tab="login" role="tab" aria-selected="true" aria-controls="loginForm">تسجيل الدخول</button>
+                <button class="auth-tab" data-tab="register" role="tab" aria-selected="false" aria-controls="registerForm">تسجيل جديد</button>
             </div>
 
             <div class="auth-forms">
                 <!-- Login Form -->
-                <div class="auth-form active" id="loginForm">
+                <div class="auth-form active" id="loginForm" role="tabpanel">
                     <div class="player-setup">
                         <label for="loginUsername">اسم المستخدم:</label>
                         <input type="text" id="loginUsername" class="player-name-input"
-                               placeholder="أدخل اسم المستخدم">
+                               placeholder="أدخل اسم المستخدم" autocomplete="username">
                     </div>
                     <div class="player-setup">
                         <label for="loginPassword">كلمة المرور:</label>
                         <input type="password" id="loginPassword" class="player-name-input"
-                               placeholder="أدخل كلمة المرور">
+                               placeholder="أدخل كلمة المرور" autocomplete="current-password">
                     </div>
                     <button class="start-game-btn" id="loginBtn">دخول</button>
-                    <p class="auth-message" id="loginMessage"></p>
+                    <p class="auth-message" id="loginMessage" aria-live="polite"></p>
                 </div>
 
                 <!-- Register Form -->
-                <div class="auth-form" id="registerForm">
+                <div class="auth-form" id="registerForm" role="tabpanel">
                     <div class="player-setup">
                         <label for="registerUsername">اسم المستخدم:</label>
                         <input type="text" id="registerUsername" class="player-name-input"
-                               placeholder="اختر اسم مستخدم">
+                               placeholder="اختر اسم مستخدم" autocomplete="username">
                     </div>
                     <div class="player-setup">
                         <label for="registerDisplayName">اسم العرض:</label>
                         <input type="text" id="registerDisplayName" class="player-name-input"
-                               placeholder="اسمك الذي سيظهر في اللعبة">
+                               placeholder="اسمك الذي سيظهر في اللعبة" autocomplete="name">
                     </div>
                     <div class="player-setup">
                         <label for="registerPassword">كلمة المرور:</label>
                         <input type="password" id="registerPassword" class="player-name-input"
-                               placeholder="اختر كلمة مرور">
+                               placeholder="اختر كلمة مرور" autocomplete="new-password">
                     </div>
                     <div class="player-setup">
                         <label for="registerConfirmPassword">تأكيد كلمة المرور:</label>
                         <input type="password" id="registerConfirmPassword" class="player-name-input"
-                               placeholder="أعد إدخال كلمة المرور">
+                               placeholder="أعد إدخال كلمة المرور" autocomplete="new-password">
                     </div>
                     <button class="start-game-btn" id="registerBtn">تسجيل</button>
-                    <p class="auth-message" id="registerMessage"></p>
+                    <p class="auth-message" id="registerMessage" aria-live="polite"></p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Game Setup Modal -->
-    <div class="game-setup-modal" id="gameSetupModal">
+    <div class="game-setup-modal" id="gameSetupModal" role="dialog" aria-modal="true" aria-labelledby="gameSetupTitle">
         <div class="game-setup-content">
-            <h2>♔ إعداد اللعبة ♚</h2>
+            <h2 id="gameSetupTitle">♔ إعداد اللعبة ♚</h2>
 
             <div class="logged-in-user">
                 <p>مرحباً، <strong id="currentUserDisplay"></strong></p>
@@ -88,17 +90,17 @@
 
             <div class="game-type-selection">
                 <h3>نوع اللعبة:</h3>
-                <div class="game-type-option selected" data-type="local">
+                <div class="game-type-option selected" data-type="local" role="button" tabindex="0" aria-pressed="true">
                     <span>لعب محلي (على نفس الجهاز)</span>
-                    <span>👥</span>
+                    <span aria-hidden="true">👥</span>
                 </div>
-                <div class="game-type-option" data-type="computer">
+                <div class="game-type-option" data-type="computer" role="button" tabindex="0" aria-pressed="false">
                     <span>اللعب ضد الكمبيوتر</span>
-                    <span>🤖</span>
+                    <span aria-hidden="true">🤖</span>
                 </div>
-                <div class="game-type-option" data-type="online">
+                <div class="game-type-option" data-type="online" role="button" tabindex="0" aria-pressed="false">
                     <span>لعب عبر الإنترنت (بكود الدخول)</span>
-                    <span>🌐</span>
+                    <span aria-hidden="true">🌐</span>
                 </div>
             </div>
 
@@ -202,19 +204,19 @@
     </div>
 
     <!-- Victory Overlay -->
-    <div class="victory-overlay" id="victoryOverlay">
+    <div class="victory-overlay" id="victoryOverlay" role="alertdialog" aria-modal="true" aria-labelledby="victoryHeading" aria-live="assertive">
         <div class="victory-content">
-            <div class="trophy">🏆</div>
-            <h2>مبروك!</h2>
+            <div class="trophy" aria-hidden="true">🏆</div>
+            <h2 id="victoryHeading">مبروك!</h2>
             <p id="victoryMessage"></p>
             <button class="start-game-btn" onclick="location.reload()">لعبة جديدة</button>
         </div>
     </div>
 
     <!-- Statistics Modal -->
-    <div class="game-setup-modal" id="statsModal">
+    <div class="game-setup-modal" id="statsModal" role="dialog" aria-modal="true" aria-labelledby="statsModalTitle">
         <div class="game-setup-content">
-            <h2>📊 إحصائيات اللعب</h2>
+            <h2 id="statsModalTitle">📊 إحصائيات اللعب</h2>
             <div id="statsContent" class="stats-content"></div>
             <div class="stats-buttons">
                 <button class="btn btn-secondary" id="exportStatsBtn">تصدير الإحصائيات</button>
@@ -225,15 +227,24 @@
     </div>
 
     <div class="container">
-        <header>
+        <header role="banner">
             <div class="header-logo">
-                <img src="https://github.com/user-attachments/assets/21e5d4fe-b810-4f76-a147-c1ce95f84c95" alt="Amira Chess Logo" class="site-logo">
+                <img src="https://github.com/user-attachments/assets/21e5d4fe-b810-4f76-a147-c1ce95f84c95" alt="شعار Amira Chess" class="site-logo" loading="lazy">
             </div>
             <h1 class="amira-title">♔ <span class="amira-name">Amira</span> <span class="chess-name">Chess</span> ♚</h1>
             <p class="subtitle">تجربة شطرنج حديثة بتصميم متطور واحترافي</p>
+
+            <!-- User bar with exit button -->
+            <div class="header-user-bar" id="headerUserBar">
+                <span class="header-username" id="headerUsernameDisplay"></span>
+                <button class="btn-exit" id="headerLogoutBtn" aria-label="تسجيل الخروج">
+                    <span class="btn-exit-icon" aria-hidden="true">⏻</span>
+                    <span class="btn-exit-label">خروج</span>
+                </button>
+            </div>
         </header>
 
-        <section class="presentation-showcase">
+        <section class="presentation-showcase" aria-label="عرض اللعبة">
             <div class="presentation-copy">
                 <div class="presentation-eyebrow">عرض الشطرنج الاحترافي</div>
                 <h2>لقطة العرض الجديدة</h2>
@@ -246,27 +257,27 @@
             </div>
             <div class="presentation-visual">
                 <div class="presentation-frame">
-                    <div class="frame-glow"></div>
-                    <img src="https://github.com/user-attachments/assets/f55e342d-ea94-4984-99a8-dc0b646008a3" alt="عرض احترافي للعبة Amira Chess">
-                    <div class="frame-badge">✨ عرض احترافي</div>
+                    <div class="frame-glow" aria-hidden="true"></div>
+                    <img src="https://github.com/user-attachments/assets/f55e342d-ea94-4984-99a8-dc0b646008a3" alt="عرض احترافي للعبة Amira Chess" loading="lazy">
+                    <div class="frame-badge" aria-hidden="true">✨ عرض احترافي</div>
                 </div>
             </div>
         </section>
 
-        <div class="game-container">
-            <div class="sidebar left-sidebar">
+        <div class="game-container" role="main">
+            <aside class="sidebar left-sidebar" aria-label="معلومات اللاعب الأسود والتحكم">
                 <div class="player-info black-player">
                     <div class="player-header">
                         <div>
                             <h3>اللاعب الأسود</h3>
                             <div class="player-name-display" id="blackPlayerNameDisplay">اللاعب الأسود</div>
                         </div>
-                        <div class="timer" id="blackTimer">10:00</div>
+                        <div class="timer" id="blackTimer" aria-label="وقت اللاعب الأسود">10:00</div>
                     </div>
-                    <div class="captured-pieces" id="blackCaptured"></div>
+                    <div class="captured-pieces" id="blackCaptured" aria-label="القطع المأسورة من الأبيض"></div>
                 </div>
 
-                <div class="game-controls">
+                <div class="game-controls" role="group" aria-label="أزرار التحكم">
                     <button class="btn btn-primary" id="newGameBtn">لعبة جديدة</button>
                     <button class="btn btn-secondary" id="undoBtn">تراجع</button>
                     <button class="btn btn-secondary" id="redoBtn">إعادة</button>
@@ -281,7 +292,7 @@
                     <button class="btn btn-secondary" id="analysisBtn">📈 التحليل</button>
                 </div>
 
-                <div class="settings">
+                <div class="settings" aria-label="إعدادات اللعبة">
                     <h3>الإعدادات</h3>
                     <label class="switch-label">
                         <input type="checkbox" id="soundToggle" checked>
@@ -311,59 +322,59 @@
                 </div>
             </div>
 
-            <div class="chess-board-container">
-                <div class="game-status" id="gameStatus">
+            <div class="chess-board-container" aria-label="لوحة الشطرنج">
+                <div class="game-status" id="gameStatus" aria-live="polite" aria-atomic="true">
                     <span class="current-turn">دور اللاعب: <strong id="currentPlayer">الأبيض</strong></span>
                     <span class="game-message" id="gameMessage"></span>
                 </div>
 
                 <div class="board-wrapper">
-                    <div class="chess-board" id="chessBoard"></div>
+                    <div class="chess-board" id="chessBoard" role="grid" aria-label="رقعة الشطرنج"></div>
                 </div>
 
-                <div class="promotion-dialog" id="promotionDialog">
+                <div class="promotion-dialog" id="promotionDialog" role="dialog" aria-modal="true" aria-label="اختيار قطعة الترقية">
                     <h3>اختر القطعة للترقية</h3>
                     <div class="promotion-pieces" id="promotionPieces"></div>
                 </div>
             </div>
 
-            <div class="sidebar right-sidebar">
+            <aside class="sidebar right-sidebar" aria-label="معلومات اللاعب الأبيض وسجل الحركات">
                 <div class="player-info white-player">
                     <div class="player-header">
                         <div>
                             <h3>اللاعب الأبيض</h3>
                             <div class="player-name-display" id="whitePlayerNameDisplay">اللاعب الأبيض</div>
                         </div>
-                        <div class="timer" id="whiteTimer">10:00</div>
+                        <div class="timer" id="whiteTimer" aria-label="وقت اللاعب الأبيض">10:00</div>
                     </div>
-                    <div class="captured-pieces" id="whiteCaptured"></div>
+                    <div class="captured-pieces" id="whiteCaptured" aria-label="القطع المأسورة من الأسود"></div>
                 </div>
 
-                <div class="move-history">
+                <div class="move-history" aria-label="سجل الحركات">
                     <h3>سجل الحركات</h3>
-                    <div class="moves-list" id="movesList"></div>
+                    <div class="moves-list" id="movesList" aria-live="polite"></div>
                 </div>
-            </div>
+            </aside>
         </div>
 
-        <footer>
+        <footer role="contentinfo">
             <p>تم التطوير باستخدام تقنيات عالية واحترافية ✨ تصميم فاخر للعب الاحترافي</p>
             <p class="owner-credit">صاحب الموقع: <strong>عبدالعزيز بن سلطان</strong></p>
         </footer>
     </div>
 
     <!-- AI Thinking Indicator -->
-    <div class="ai-thinking-indicator" id="aiThinkingIndicator" style="display: none;">
+    <div class="ai-thinking-indicator" id="aiThinkingIndicator" style="display: none;" aria-live="polite" aria-label="الذكاء الاصطناعي يفكر">
         <div class="thinking-content">
-            <div class="thinking-spinner"></div>
+            <div class="thinking-spinner" aria-hidden="true"></div>
             <p>🤖 الذكاء الاصطناعي يفكر...</p>
         </div>
     </div>
 
     <!-- Puzzles Modal -->
-    <div class="game-setup-modal" id="puzzlesModal">
+    <div class="game-setup-modal" id="puzzlesModal" role="dialog" aria-modal="true" aria-labelledby="puzzlesModalTitle">
         <div class="game-setup-content">
-            <h2>🧩 ألغاز الشطرنج</h2>
+            <h2 id="puzzlesModalTitle">🧩 ألغاز الشطرنج</h2>
             <div id="puzzleContent" class="puzzle-content">
                 <div class="puzzle-header">
                     <h3 id="puzzleTitle">لغز اليوم</h3>
@@ -385,13 +396,13 @@
     </div>
 
     <!-- Achievements Modal -->
-    <div class="game-setup-modal" id="achievementsModal">
+    <div class="game-setup-modal" id="achievementsModal" role="dialog" aria-modal="true" aria-labelledby="achievementsModalTitle">
         <div class="game-setup-content">
-            <h2>🏆 الإنجازات</h2>
+            <h2 id="achievementsModalTitle">🏆 الإنجازات</h2>
             <div id="achievementsContent" class="achievements-content">
                 <div class="achievements-progress">
                     <p>التقدم: <span id="achievementsProgress">0/15</span></p>
-                    <div class="progress-bar">
+                    <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0" aria-label="تقدم الإنجازات">
                         <div class="progress-fill" id="achievementsProgressBar" style="width: 0%"></div>
                     </div>
                 </div>
@@ -402,9 +413,9 @@
     </div>
 
     <!-- Analysis Modal -->
-    <div class="game-setup-modal" id="analysisModal">
+    <div class="game-setup-modal" id="analysisModal" role="dialog" aria-modal="true" aria-labelledby="analysisModalTitle">
         <div class="game-setup-content">
-            <h2>📈 تحليل اللعبة</h2>
+            <h2 id="analysisModalTitle">📈 تحليل اللعبة</h2>
             <div id="analysisContent" class="analysis-content">
                 <div class="position-evaluation">
                     <h3>تقييم الموقف</h3>

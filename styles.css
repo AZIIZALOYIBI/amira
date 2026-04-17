@@ -78,37 +78,41 @@ html {
 }
 
 :root {
-    /* Modern Ultra Design - Advanced & Sophisticated */
+    /* Modern Design System */
     --primary-color: #0f1419;
     --secondary-color: #667eea;
     --accent-color: #764ba2;
     --tertiary-color: #f093fb;
-    --light-square: #ffffff;
-    --dark-square: #a8b3cf;
-    --highlight-color: rgba(102, 126, 234, 0.4);
-    --valid-move: rgba(118, 75, 162, 0.5);
+    --light-square: #f0f4ff;
+    --dark-square: #8fa3d0;
+    --highlight-color: rgba(102, 126, 234, 0.45);
+    --valid-move: rgba(118, 75, 162, 0.55);
     --check-color: rgba(239, 68, 68, 0.65);
     --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
     --glass-bg: rgba(255, 255, 255, 0.08);
     --glass-border: rgba(255, 255, 255, 0.18);
-    --shadow: 0 8px 32px rgba(102, 126, 234, 0.15), 0 4px 16px rgba(118, 75, 162, 0.1);
-    --shadow-hover: 0 16px 48px rgba(102, 126, 234, 0.25), 0 8px 24px rgba(118, 75, 162, 0.15);
-    --shadow-active: 0 4px 16px rgba(102, 126, 234, 0.12), 0 2px 8px rgba(118, 75, 162, 0.08);
+    --shadow: 0 8px 32px rgba(102, 126, 234, 0.18), 0 4px 16px rgba(118, 75, 162, 0.12);
+    --shadow-hover: 0 16px 48px rgba(102, 126, 234, 0.28), 0 8px 24px rgba(118, 75, 162, 0.18);
+    --shadow-active: 0 4px 16px rgba(102, 126, 234, 0.14), 0 2px 8px rgba(118, 75, 162, 0.1);
     --gold-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    --luxury-shadow: 0 12px 40px rgba(102, 126, 234, 0.3), 0 0 60px rgba(118, 75, 162, 0.2);
-    --text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    --luxury-shadow: 0 12px 40px rgba(102, 126, 234, 0.32), 0 0 60px rgba(118, 75, 162, 0.22);
+    --text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     --border-radius-sm: 12px;
     --border-radius-md: 16px;
     --border-radius-lg: 24px;
-    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.45s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Glassmorphism Variables */
     --glass-light: rgba(255, 255, 255, 0.1);
     --glass-medium: rgba(255, 255, 255, 0.15);
-    --glass-strong: rgba(255, 255, 255, 0.2);
+    --glass-strong: rgba(255, 255, 255, 0.22);
     --backdrop-blur: blur(20px);
+
+    /* Board size custom property for fluid scaling */
+    --square-size: 80px;
+    --board-font-size: 50px;
 }
 
 /* Theme: Classic Brown */
@@ -859,6 +863,115 @@ header .subtitle {
     letter-spacing: 1px;
 }
 
+/* ---- Header User Bar & Exit Button ---- */
+.header-user-bar {
+    display: none; /* shown by JS after login */
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 18px;
+    animation: slideUpFadeIn 0.9s ease-out 0.5s backwards;
+}
+
+.header-username {
+    font-size: 0.95em;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 600;
+    padding: 7px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    letter-spacing: 0.3px;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.btn-exit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 20px;
+    background: rgba(220, 53, 69, 0.18);
+    border: 1.5px solid rgba(220, 53, 69, 0.45);
+    color: #ff8a95;
+    border-radius: 999px;
+    font-size: 0.92em;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    letter-spacing: 0.3px;
+    backdrop-filter: blur(10px);
+    transition:
+        background var(--transition-normal),
+        border-color var(--transition-normal),
+        color var(--transition-normal),
+        transform var(--transition-fast),
+        box-shadow var(--transition-normal);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn-exit-icon {
+    font-size: 1.05em;
+    line-height: 1;
+    transition: transform var(--transition-normal);
+}
+
+.btn-exit:hover {
+    background: rgba(220, 53, 69, 0.35);
+    border-color: rgba(220, 53, 69, 0.75);
+    color: #ffffff;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.35), 0 0 30px rgba(220, 53, 69, 0.15);
+}
+
+.btn-exit:hover .btn-exit-icon {
+    transform: rotate(90deg);
+}
+
+.btn-exit:active {
+    transform: scale(0.96) translateY(0);
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+}
+
+.btn-exit:focus-visible {
+    outline: 2px solid rgba(220, 53, 69, 0.8);
+    outline-offset: 3px;
+}
+
+/* Hide the user bar when no user is logged in */
+.header-user-bar:empty,
+.header-user-bar[data-hidden="true"] {
+    display: none;
+}
+
+/* Mobile responsive for user bar */
+@media (max-width: 480px) {
+    .header-user-bar {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .header-username {
+        font-size: 0.85em;
+        padding: 6px 12px;
+        max-width: 160px;
+    }
+
+    .btn-exit {
+        padding: 8px 16px;
+        font-size: 0.85em;
+    }
+
+    .btn-exit-label {
+        display: inline; /* always show label, icon is enough hint */
+    }
+}
+
 .presentation-showcase {
     display: grid;
     grid-template-columns: minmax(280px, 0.55fr) minmax(320px, 0.45fr);
@@ -1162,6 +1275,14 @@ header .subtitle {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
     will-change: transform;
+    /* Minimum touch target size for accessibility */
+    min-height: 44px;
+}
+
+.btn:focus-visible {
+    outline: 2px solid rgba(102, 126, 234, 0.8);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.35);
 }
 
 .btn:focus {
@@ -1356,8 +1477,8 @@ header .subtitle {
 
 .chess-board {
     display: grid;
-    grid-template-columns: repeat(8, 80px);
-    grid-template-rows: repeat(8, 80px);
+    grid-template-columns: repeat(8, var(--square-size));
+    grid-template-rows: repeat(8, var(--square-size));
     border: 3px solid rgba(255, 255, 255, 0.3);
     box-shadow:
         0 20px 60px rgba(102, 126, 234, 0.3),
@@ -1374,12 +1495,12 @@ header .subtitle {
 }
 
 .square {
-    width: 80px;
-    height: 80px;
+    width: var(--square-size);
+    height: var(--square-size);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 50px;
+    font-size: var(--board-font-size);
     cursor: pointer;
     position: relative;
     transition: all var(--transition-fast);
@@ -1677,10 +1798,9 @@ footer .owner-credit strong {
 .game-setup-modal {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;           /* top:0 left:0 right:0 bottom:0 — no height/width needed */
+    width: 100vw;
+    height: 100vh;
     background: rgba(0, 0, 0, 0);
     z-index: 2000;
     justify-content: center;
@@ -1689,30 +1809,26 @@ footer .owner-credit strong {
     -webkit-overflow-scrolling: touch;
     overflow-y: auto;
     transition: background var(--transition-normal) ease-out;
-    backdrop-filter: blur(0px);
 }
 
 .game-setup-modal.active {
     display: flex;
-    background: rgba(0, 0, 0, 0.9);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    background: rgba(0, 0, 0, 0.82);
     animation: fadeIn 0.3s ease-out;
 }
 
 .game-setup-content {
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.08) 100%);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
+    background: linear-gradient(145deg, #3730a3 0%, #4c1d95 60%, #312e81 100%);
     padding: 50px;
     border-radius: var(--border-radius-lg);
     box-shadow:
-        0 20px 60px rgba(102, 126, 234, 0.3),
-        0 0 1px rgba(255, 255, 255, 0.3) inset;
+        0 24px 64px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.18),
+        0 0 80px rgba(102, 126, 234, 0.25);
     max-width: 600px;
     width: 90%;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    animation: slideUpBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    animation: slideUpFadeIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
     transform-origin: center center;
     position: relative;
 }
@@ -1744,8 +1860,7 @@ footer .owner-credit strong {
 .player-setup {
     margin-bottom: 25px;
     padding: 22px;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.25);
     border-radius: var(--border-radius-md);
     border: 1px solid rgba(255, 255, 255, 0.15);
     animation: slideUpFadeIn 0.5s ease-out backwards;
@@ -1852,16 +1967,14 @@ footer .owner-credit strong {
 .victory-overlay {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
     background: rgba(0, 0, 0, 0);
     z-index: 3000;
     justify-content: center;
     align-items: center;
     transition: background var(--transition-slow) ease-out;
-    backdrop-filter: blur(0px);
 }
 
 .victory-overlay.active {
@@ -2155,23 +2268,17 @@ footer .owner-credit strong {
 
 /* Responsive Design */
 @media (max-width: 1400px) {
+    :root {
+        --square-size: 70px;
+        --board-font-size: 45px;
+    }
+
     .presentation-showcase {
         grid-template-columns: 1fr 1fr;
     }
 
     .game-container {
         grid-template-columns: 250px 1fr 250px;
-    }
-
-    .chess-board {
-        grid-template-columns: repeat(8, 70px);
-        grid-template-rows: repeat(8, 70px);
-    }
-
-    .square {
-        width: 70px;
-        height: 70px;
-        font-size: 45px;
     }
 }
 
@@ -2215,6 +2322,11 @@ footer .owner-credit strong {
 }
 
 @media (max-width: 768px) {
+    :root {
+        --square-size: 50px;
+        --board-font-size: 35px;
+    }
+
     /* Reduce animation complexity on mobile */
     *, *::before, *::after {
         animation-duration: 0.2s !important;
@@ -2288,16 +2400,16 @@ footer .owner-credit strong {
     }
 
     .chess-board {
-        grid-template-columns: repeat(8, 50px);
-        grid-template-rows: repeat(8, 50px);
+        grid-template-columns: repeat(8, var(--square-size));
+        grid-template-rows: repeat(8, var(--square-size));
         /* Further optimize board rendering */
         contain: layout style paint;
     }
 
     .square {
-        width: 50px;
-        height: 50px;
-        font-size: 35px;
+        width: var(--square-size);
+        height: var(--square-size);
+        font-size: var(--board-font-size);
     }
 
     .left-sidebar, .right-sidebar {
@@ -2383,6 +2495,11 @@ footer .owner-credit strong {
 }
 
 @media (max-width: 480px) {
+    :root {
+        --square-size: 42px;
+        --board-font-size: 28px;
+    }
+
     /* Further optimize for small screens */
     *, *::before, *::after {
         animation-duration: 0.15s !important;
@@ -2425,16 +2542,16 @@ footer .owner-credit strong {
     }
 
     .chess-board {
-        grid-template-columns: repeat(8, 40px);
-        grid-template-rows: repeat(8, 40px);
+        grid-template-columns: repeat(8, var(--square-size));
+        grid-template-rows: repeat(8, var(--square-size));
         /* Maximize mobile performance */
         contain: strict;
     }
 
     .square {
-        width: 40px;
-        height: 40px;
-        font-size: 28px;
+        width: var(--square-size);
+        height: var(--square-size);
+        font-size: var(--board-font-size);
     }
 
     .sidebar {
@@ -2618,15 +2735,20 @@ footer .owner-credit strong {
 
 /* Landscape mode for small screens */
 @media (max-width: 768px) and (orientation: landscape) {
+    :root {
+        --square-size: 45px;
+        --board-font-size: 32px;
+    }
+
     .chess-board {
-        grid-template-columns: repeat(8, 45px);
-        grid-template-rows: repeat(8, 45px);
+        grid-template-columns: repeat(8, var(--square-size));
+        grid-template-rows: repeat(8, var(--square-size));
     }
 
     .square {
-        width: 45px;
-        height: 45px;
-        font-size: 32px;
+        width: var(--square-size);
+        height: var(--square-size);
+        font-size: var(--board-font-size);
     }
 
     .game-container {
@@ -2648,15 +2770,20 @@ footer .owner-credit strong {
 
 /* Extra small screens in landscape */
 @media (max-width: 480px) and (orientation: landscape) {
+    :root {
+        --square-size: 35px;
+        --board-font-size: 24px;
+    }
+
     .chess-board {
-        grid-template-columns: repeat(8, 35px);
-        grid-template-rows: repeat(8, 35px);
+        grid-template-columns: repeat(8, var(--square-size));
+        grid-template-rows: repeat(8, var(--square-size));
     }
 
     .square {
-        width: 35px;
-        height: 35px;
-        font-size: 25px;
+        width: var(--square-size);
+        height: var(--square-size);
+        font-size: var(--board-font-size);
     }
 
     header h1 {
@@ -2670,15 +2797,20 @@ footer .owner-credit strong {
 
 /* Very small screens */
 @media (max-width: 360px) {
+    :root {
+        --square-size: 35px;
+        --board-font-size: 24px;
+    }
+
     .chess-board {
-        grid-template-columns: repeat(8, 35px);
-        grid-template-rows: repeat(8, 35px);
+        grid-template-columns: repeat(8, var(--square-size));
+        grid-template-rows: repeat(8, var(--square-size));
     }
 
     .square {
-        width: 35px;
-        height: 35px;
-        font-size: 25px;
+        width: var(--square-size);
+        height: var(--square-size);
+        font-size: var(--board-font-size);
     }
 
     header h1 {

@@ -45,6 +45,9 @@ class ChessUI {
     showLoginModal() {
         document.getElementById('loginModal').classList.add('active');
         document.getElementById('gameSetupModal').classList.remove('active');
+        // Hide the header user bar when not logged in
+        const headerBar = document.getElementById('headerUserBar');
+        if (headerBar) headerBar.style.display = 'none';
     }
 
     showGameSetup() {
@@ -54,6 +57,13 @@ class ChessUI {
         const user = this.auth.getCurrentUser();
         if (user) {
             document.getElementById('currentUserDisplay').textContent = user.displayName;
+            // Update the header user bar
+            const headerBar = document.getElementById('headerUserBar');
+            const headerUsername = document.getElementById('headerUsernameDisplay');
+            if (headerBar && headerUsername) {
+                headerUsername.textContent = '👤 ' + user.displayName;
+                headerBar.style.display = 'flex';
+            }
         }
     }
 
@@ -76,8 +86,14 @@ class ChessUI {
         // Register button
         document.getElementById('registerBtn').addEventListener('click', () => this.handleRegister());
 
-        // Logout button
+        // Logout button (in game setup modal)
         document.getElementById('logoutBtn').addEventListener('click', () => this.handleLogout());
+
+        // Header exit button (always visible in main UI)
+        const headerLogoutBtn = document.getElementById('headerLogoutBtn');
+        if (headerLogoutBtn) {
+            headerLogoutBtn.addEventListener('click', () => this.handleLogout());
+        }
 
         // Enter key for forms
         document.getElementById('loginPassword').addEventListener('keypress', (e) => {

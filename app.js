@@ -204,11 +204,12 @@ class ChessUI {
     initRoomCodeInputs() {
         const digitInputs = document.querySelectorAll('.room-digit-input');
         const hiddenInput = document.getElementById('roomCodeInput');
+        const digitsOnly = (str) => str.replace(/[^0-9]/g, '');
 
         digitInputs.forEach((input, index) => {
             // Allow only digits
             input.addEventListener('input', (e) => {
-                const value = e.target.value.replace(/[^0-9]/g, '');
+                const value = digitsOnly(e.target.value);
                 e.target.value = value;
 
                 if (value.length === 1) {
@@ -257,7 +258,7 @@ class ChessUI {
             // Handle paste - distribute pasted digits across inputs
             input.addEventListener('paste', (e) => {
                 e.preventDefault();
-                const pastedData = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
+                const pastedData = digitsOnly((e.clipboardData || window.clipboardData).getData('text'));
 
                 if (pastedData.length > 0) {
                     const digits = pastedData.slice(0, 6).split('');
@@ -351,7 +352,7 @@ class ChessUI {
             document.execCommand('copy');
             this.showCopyFeedback();
         } catch (err) {
-            // Silently fail
+            this.showCopyError();
         }
         document.body.removeChild(textArea);
     }
@@ -361,10 +362,25 @@ class ChessUI {
         if (btn) {
             const originalText = btn.textContent;
             btn.textContent = '✓ تم النسخ!';
+            btn.setAttribute('aria-label', 'تم نسخ كود الغرفة بنجاح');
             btn.classList.add('copied');
             setTimeout(() => {
                 btn.textContent = originalText;
+                btn.setAttribute('aria-label', 'نسخ كود الغرفة');
                 btn.classList.remove('copied');
+            }, 2000);
+        }
+    }
+
+    showCopyError() {
+        const btn = document.querySelector('.copy-code-btn');
+        if (btn) {
+            const originalText = btn.textContent;
+            btn.textContent = '✗ تعذر النسخ';
+            btn.setAttribute('aria-label', 'تعذر نسخ كود الغرفة');
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.setAttribute('aria-label', 'نسخ كود الغرفة');
             }, 2000);
         }
     }
@@ -404,13 +420,19 @@ class ChessUI {
                     roomCodeDisplay.innerHTML = `
                         <h3>🔑 كود الغرفة:</h3>
                         <div class="room-code-large">${codeDigits}</div>
-                        <button class="copy-code-btn" onclick="window.chessUI.copyRoomCode('${result.roomCode}')">📋 نسخ الكود</button>
+                        <button class="copy-code-btn" aria-label="نسخ كود الغرفة">📋 نسخ الكود</button>
                         <p class="room-info">شارك هذا الكود مع الشخص الآخر للانضمام</p>
                         <div class="waiting-indicator">
                             <div class="waiting-spinner"></div>
                             <p class="waiting-text">في انتظار اللاعب الآخر...</p>
                         </div>
                     `;
+
+                    // Attach copy event listener programmatically
+                    const copyBtn = roomCodeDisplay.querySelector('.copy-code-btn');
+                    if (copyBtn) {
+                        copyBtn.addEventListener('click', () => this.copyRoomCode(result.roomCode));
+                    }
 
                     // Set player names
                     this.playerNames.white = user.displayName;

@@ -10,23 +10,121 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Login/Registration Modal -->
+    <div class="game-setup-modal active" id="loginModal">
+        <div class="game-setup-content">
+            <h2>♔ تسجيل الدخول ♚</h2>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">تسجيل الدخول</button>
+                <button class="auth-tab" data-tab="register">تسجيل جديد</button>
+            </div>
+
+            <div class="auth-forms">
+                <!-- Login Form -->
+                <div class="auth-form active" id="loginForm">
+                    <div class="player-setup">
+                        <label for="loginUsername">اسم المستخدم:</label>
+                        <input type="text" id="loginUsername" class="player-name-input"
+                               placeholder="أدخل اسم المستخدم">
+                    </div>
+                    <div class="player-setup">
+                        <label for="loginPassword">كلمة المرور:</label>
+                        <input type="password" id="loginPassword" class="player-name-input"
+                               placeholder="أدخل كلمة المرور">
+                    </div>
+                    <button class="start-game-btn" id="loginBtn">دخول</button>
+                    <p class="auth-message" id="loginMessage"></p>
+                </div>
+
+                <!-- Register Form -->
+                <div class="auth-form" id="registerForm">
+                    <div class="player-setup">
+                        <label for="registerUsername">اسم المستخدم:</label>
+                        <input type="text" id="registerUsername" class="player-name-input"
+                               placeholder="اختر اسم مستخدم">
+                    </div>
+                    <div class="player-setup">
+                        <label for="registerDisplayName">اسم العرض:</label>
+                        <input type="text" id="registerDisplayName" class="player-name-input"
+                               placeholder="اسمك الذي سيظهر في اللعبة">
+                    </div>
+                    <div class="player-setup">
+                        <label for="registerPassword">كلمة المرور:</label>
+                        <input type="password" id="registerPassword" class="player-name-input"
+                               placeholder="اختر كلمة مرور">
+                    </div>
+                    <div class="player-setup">
+                        <label for="registerConfirmPassword">تأكيد كلمة المرور:</label>
+                        <input type="password" id="registerConfirmPassword" class="player-name-input"
+                               placeholder="أعد إدخال كلمة المرور">
+                    </div>
+                    <button class="start-game-btn" id="registerBtn">تسجيل</button>
+                    <p class="auth-message" id="registerMessage"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Game Setup Modal -->
-    <div class="game-setup-modal active" id="gameSetupModal">
+    <div class="game-setup-modal" id="gameSetupModal">
         <div class="game-setup-content">
             <h2>♔ إعداد اللعبة ♚</h2>
 
-            <div class="player-setup">
-                <h3>♔ اللاعب الأبيض</h3>
-                <label for="whitePlayerName">اسم اللاعب:</label>
-                <input type="text" id="whitePlayerName" class="player-name-input"
-                       placeholder="أدخل اسم اللاعب الأبيض" value="اللاعب الأبيض">
+            <div class="logged-in-user">
+                <p>مرحباً، <strong id="currentUserDisplay"></strong></p>
+                <button class="btn btn-secondary" id="logoutBtn">تسجيل خروج</button>
             </div>
 
-            <div class="player-setup">
-                <h3>♚ اللاعب الأسود</h3>
-                <label for="blackPlayerName">اسم اللاعب:</label>
-                <input type="text" id="blackPlayerName" class="player-name-input"
-                       placeholder="أدخل اسم اللاعب الأسود" value="اللاعب الأسود">
+            <div class="game-type-selection">
+                <h3>نوع اللعبة:</h3>
+                <div class="game-type-option selected" data-type="local">
+                    <span>لعب محلي (على نفس الجهاز)</span>
+                    <span>👥</span>
+                </div>
+                <div class="game-type-option" data-type="online">
+                    <span>لعب عبر الإنترنت (بكود الدخول)</span>
+                    <span>🌐</span>
+                </div>
+            </div>
+
+            <!-- Local Game Setup -->
+            <div class="local-game-setup" id="localGameSetup">
+                <div class="player-setup">
+                    <h3>♔ اللاعب الأبيض</h3>
+                    <label for="whitePlayerName">اسم اللاعب:</label>
+                    <input type="text" id="whitePlayerName" class="player-name-input"
+                           placeholder="أدخل اسم اللاعب الأبيض" value="اللاعب الأبيض">
+                </div>
+
+                <div class="player-setup">
+                    <h3>♚ اللاعب الأسود</h3>
+                    <label for="blackPlayerName">اسم اللاعب:</label>
+                    <input type="text" id="blackPlayerName" class="player-name-input"
+                           placeholder="أدخل اسم اللاعب الأسود" value="اللاعب الأسود">
+                </div>
+            </div>
+
+            <!-- Online Game Setup -->
+            <div class="online-game-setup" id="onlineGameSetup" style="display: none;">
+                <div class="room-code-section">
+                    <div class="room-code-tabs">
+                        <button class="room-tab active" data-action="create">إنشاء غرفة</button>
+                        <button class="room-tab" data-action="join">الانضمام لغرفة</button>
+                    </div>
+
+                    <div class="room-create active" id="roomCreate">
+                        <p>سيتم إنشاء كود دخول جديد للغرفة</p>
+                        <div class="room-code-display" id="roomCodeDisplay"></div>
+                    </div>
+
+                    <div class="room-join" id="roomJoin">
+                        <label for="roomCodeInput">كود الدخول:</label>
+                        <input type="text" id="roomCodeInput" class="player-name-input"
+                               placeholder="أدخل كود الدخول (6 أرقام)" maxlength="6">
+                        <p class="room-status" id="roomStatus"></p>
+                    </div>
+                </div>
             </div>
 
             <div class="game-mode-selection">
@@ -175,6 +273,7 @@
         </footer>
     </div>
 
+    <script src="auth.js"></script>
     <script src="chess.js"></script>
     <script src="statistics.js"></script>
     <script src="app.js"></script>

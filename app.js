@@ -783,7 +783,7 @@ class ChessUI {
     }
 
     changeTheme(theme) {
-        document.body.classList.remove('theme-classic', 'theme-blue', 'theme-green', 'theme-purple', 'theme-red', 'theme-cloud');
+        document.body.classList.remove('theme-classic', 'theme-blue', 'theme-green', 'theme-purple', 'theme-red', 'theme-cloud', 'theme-claude-orange');
         if (theme !== 'default') {
             document.body.classList.add(`theme-${theme}`);
         }

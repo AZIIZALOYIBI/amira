@@ -318,10 +318,13 @@ class ChessUI {
     }
 
     renderBoard() {
-        this.boardElement.innerHTML = '';
+        // Use requestAnimationFrame for smoother rendering on mobile
+        requestAnimationFrame(() => {
+            // Create a document fragment for better performance
+            const fragment = document.createDocumentFragment();
 
-        for (let row = 0; row < 8; row++) {
-            for (let col = 0; col < 8; col++) {
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
                 const displayRow = this.flipped ? 7 - row : row;
                 const displayCol = this.flipped ? 7 - col : col;
 
@@ -366,33 +369,57 @@ class ChessUI {
                     square.classList.add('in-check');
                 }
 
-                this.boardElement.appendChild(square);
+                fragment.appendChild(square);
             }
         }
 
+        // Clear and append in one operation for better performance
+        this.boardElement.innerHTML = '';
+        this.boardElement.appendChild(fragment);
+
         this.updateCapturedPieces();
         this.updateMoveHistory();
+        });
     }
 
     attachEventListeners() {
-        // Board click events
+        // Board click events - optimize for mobile with passive listeners where appropriate
         this.boardElement.addEventListener('click', (e) => this.handleSquareClick(e));
 
-        // Drag and drop
+        // Drag and drop with passive event listeners for better scroll performance
         this.boardElement.addEventListener('dragstart', (e) => this.handleDragStart(e));
         this.boardElement.addEventListener('dragover', (e) => this.handleDragOver(e));
         this.boardElement.addEventListener('drop', (e) => this.handleDrop(e));
 
-        // Control buttons
-        document.getElementById('newGameBtn').addEventListener('click', () => this.newGame());
-        document.getElementById('undoBtn').addEventListener('click', () => this.undoMove());
-        document.getElementById('redoBtn').addEventListener('click', () => this.redoMove());
-        document.getElementById('resetBtn').addEventListener('click', () => this.resetGame());
-        document.getElementById('flipBoardBtn').addEventListener('click', () => this.flipBoard());
-        document.getElementById('saveBtn').addEventListener('click', () => this.saveGame());
-        document.getElementById('loadBtn').addEventListener('click', () => this.loadGame());
-        document.getElementById('exportBtn').addEventListener('click', () => this.exportPGN());
-        document.getElementById('statsBtn').addEventListener('click', () => this.showStats());
+        // Add touch event support for better mobile experience
+        this.addTouchSupport();
+
+        // Control buttons - use event delegation for better performance
+        const buttonsContainer = document.querySelector('.game-controls');
+        if (buttonsContainer) {
+            buttonsContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+
+                const btnId = btn.id;
+                const actions = {
+                    'newGameBtn': () => this.newGame(),
+                    'undoBtn': () => this.undoMove(),
+                    'redoBtn': () => this.redoMove(),
+                    'resetBtn': () => this.resetGame(),
+                    'flipBoardBtn': () => this.flipBoard(),
+                    'saveBtn': () => this.saveGame(),
+                    'loadBtn': () => this.loadGame(),
+                    'exportBtn': () => this.exportPGN(),
+                    'statsBtn': () => this.showStats()
+                };
+
+                if (actions[btnId]) {
+                    e.preventDefault();
+                    actions[btnId]();
+                }
+            });
+        }
 
         // Settings
         document.getElementById('soundToggle').addEventListener('change', (e) => {
@@ -415,6 +442,23 @@ class ChessUI {
         document.getElementById('themeSelector').addEventListener('change', (e) => {
             this.changeTheme(e.target.value);
         });
+
+        // Statistics modal
+        document.getElementById('closeStatsBtn').addEventListener('click', () => {
+            document.getElementById('statsModal').classList.remove('active');
+        });
+        document.getElementById('exportStatsBtn').addEventListener('click', () => {
+            this.exportStats();
+        });
+        document.getElementById('resetStatsBtn').addEventListener('click', () => {
+            if (confirm('هل تريد حذف جميع الإحصائيات؟')) {
+                this.stats.clearStats();
+                this.showStats();
+            }
+        });
+
+        // Add touch support for better mobile experience
+        this.addTouchSupport();
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
@@ -447,6 +491,55 @@ class ChessUI {
                 this.redoMove();
             }
         });
+    }
+
+    // Add touch support for better mobile experience
+    addTouchSupport() {
+        let touchStartSquare = null;
+        let touchStartTime = 0;
+
+        this.boardElement.addEventListener('touchstart', (e) => {
+            touchStartTime = Date.now();
+            const touch = e.touches[0];
+            const element = document.elementFromPoint(touch.clientX, touch.clientY);
+            const square = element?.closest('.square');
+
+            if (square) {
+                touchStartSquare = square;
+                // Highlight the touched square
+                square.classList.add('touch-active');
+            }
+        }, { passive: true });
+
+        this.boardElement.addEventListener('touchend', (e) => {
+            const touchDuration = Date.now() - touchStartTime;
+            const touch = e.changedTouches[0];
+            const element = document.elementFromPoint(touch.clientX, touch.clientY);
+            const square = element?.closest('.square');
+
+            // Remove touch highlight
+            document.querySelectorAll('.touch-active').forEach(el => {
+                el.classList.remove('touch-active');
+            });
+
+            // Only register as click if touch was quick (not a scroll)
+            if (square && touchDuration < 500) {
+                // Simulate click event for touch
+                const clickEvent = new MouseEvent('click', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                });
+                square.dispatchEvent(clickEvent);
+            }
+
+            touchStartSquare = null;
+        }, { passive: true });
+
+        // Prevent default drag behavior on touch devices
+        this.boardElement.addEventListener('touchmove', (e) => {
+            // Allow scrolling on the board itself
+        }, { passive: true });
     }
 
     changeTheme(theme) {

@@ -406,6 +406,155 @@ header .subtitle {
     letter-spacing: 1px;
 }
 
+.presentation-showcase {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.55fr) minmax(320px, 0.45fr);
+    gap: 28px;
+    align-items: center;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.82) 0%, rgba(232, 244, 253, 0.85) 50%, rgba(197, 227, 246, 0.9) 100%);
+    border-radius: var(--border-radius-lg);
+    padding: 26px 32px;
+    box-shadow: var(--shadow);
+    border: 2px solid rgba(107, 154, 196, 0.14);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 28px;
+    isolation: isolate;
+}
+
+.presentation-showcase::before,
+.presentation-showcase::after {
+    content: '';
+    position: absolute;
+    border-radius: 999px;
+    filter: blur(40px);
+    opacity: 0.35;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(107, 154, 196, 0.4) 0%, transparent 55%);
+}
+
+.presentation-showcase::before {
+    width: 320px;
+    height: 320px;
+    top: -120px;
+    left: -80px;
+}
+
+.presentation-showcase::after {
+    width: 260px;
+    height: 260px;
+    bottom: -120px;
+    right: -60px;
+}
+
+.presentation-copy {
+    position: relative;
+    z-index: 1;
+    color: var(--primary-color);
+}
+
+.presentation-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(107, 154, 196, 0.12);
+    color: var(--secondary-color);
+    font-weight: 700;
+    font-size: 0.95em;
+    letter-spacing: 0.5px;
+    box-shadow: 0 6px 14px rgba(107, 154, 196, 0.12);
+}
+
+.presentation-copy h2 {
+    margin: 14px 0 10px;
+    font-size: clamp(1.5em, 4vw, 2.1em);
+    color: var(--primary-color);
+    text-shadow: var(--text-shadow);
+}
+
+.presentation-copy p {
+    margin-bottom: 16px;
+    color: rgba(26, 31, 46, 0.85);
+    line-height: 1.8;
+}
+
+.presentation-highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.presentation-pill {
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(107, 154, 196, 0.15), rgba(160, 209, 240, 0.25));
+    color: var(--primary-color);
+    border: 1px solid rgba(107, 154, 196, 0.18);
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(107, 154, 196, 0.15);
+    backdrop-filter: blur(6px);
+}
+
+.presentation-visual {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.presentation-frame {
+    position: relative;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.85), rgba(240, 246, 252, 0.9));
+    border-radius: 18px;
+    padding: 12px;
+    box-shadow: var(--luxury-shadow), 0 18px 40px rgba(107, 154, 196, 0.25);
+    border: 2px solid rgba(107, 154, 196, 0.18);
+    overflow: hidden;
+    isolation: isolate;
+    min-width: min(520px, 100%);
+}
+
+.presentation-frame img {
+    width: 100%;
+    display: block;
+    border-radius: 14px;
+    box-shadow: 0 10px 28px rgba(26, 26, 46, 0.18);
+    transform: rotate(-1.2deg);
+    transition: transform var(--transition-slow), box-shadow var(--transition-normal);
+    background: #f8fafc;
+}
+
+.presentation-frame:hover img {
+    transform: rotate(0deg) scale(1.01);
+    box-shadow: 0 18px 45px rgba(26, 26, 46, 0.22);
+}
+
+.frame-glow {
+    position: absolute;
+    inset: -30%;
+    background: radial-gradient(circle at 30% 20%, rgba(212, 175, 55, 0.22), transparent 40%),
+                radial-gradient(circle at 80% 60%, rgba(107, 154, 196, 0.25), transparent 45%);
+    z-index: 0;
+    filter: blur(10px);
+    opacity: 0.9;
+}
+
+.frame-badge {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: linear-gradient(135deg, #6b9ac4, #a0d1f0);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    box-shadow: 0 6px 16px rgba(107, 154, 196, 0.35);
+    backdrop-filter: blur(6px);
+}
+
 .game-container {
     display: grid;
     grid-template-columns: 300px 1fr 300px;
@@ -1501,6 +1650,10 @@ footer .owner-credit strong {
 
 /* Responsive Design */
 @media (max-width: 1400px) {
+    .presentation-showcase {
+        grid-template-columns: 1fr 1fr;
+    }
+
     .game-container {
         grid-template-columns: 250px 1fr 250px;
     }
@@ -1518,6 +1671,24 @@ footer .owner-credit strong {
 }
 
 @media (max-width: 1200px) {
+    .presentation-showcase {
+        grid-template-columns: 1fr;
+        padding: 22px 20px;
+        text-align: center;
+    }
+
+    .presentation-highlights {
+        justify-content: center;
+    }
+
+    .presentation-visual {
+        order: -1;
+    }
+
+    .presentation-frame {
+        min-width: 100%;
+    }
+
     .game-container {
         grid-template-columns: 1fr;
         gap: 15px;
@@ -1587,6 +1758,28 @@ footer .owner-credit strong {
             animation: gradientShift 3s ease infinite;
             transform: none;
         }
+    }
+
+    .presentation-showcase {
+        padding: 18px;
+        gap: 16px;
+    }
+
+    .presentation-copy h2 {
+        font-size: 1.6em;
+    }
+
+    .presentation-frame {
+        min-width: 100%;
+        padding: 10px;
+    }
+
+    .presentation-frame img {
+        transform: none;
+    }
+
+    .frame-badge {
+        font-size: 0.9em;
     }
 
     .chess-board {
@@ -1708,6 +1901,21 @@ footer .owner-credit strong {
     }
 
     .subtitle {
+        font-size: 0.85em;
+    }
+
+    .presentation-showcase {
+        padding: 14px;
+    }
+
+    .presentation-pill {
+        width: 100%;
+        text-align: center;
+    }
+
+    .frame-badge {
+        top: 10px;
+        right: 10px;
         font-size: 0.85em;
     }
 

@@ -1948,6 +1948,11 @@ footer .owner-credit strong {
     border-radius: 8px;
 }
 
+.room-tab:hover {
+    background: rgba(212, 175, 55, 0.2);
+    transform: translateY(-1px);
+}
+
 .room-tab.active {
     background: var(--secondary-color);
     color: var(--primary-color);
@@ -1972,25 +1977,106 @@ footer .owner-credit strong {
 .room-code-display h3 {
     color: var(--secondary-color);
     margin-bottom: 15px;
+    font-size: 18px;
 }
 
 .room-code-large {
-    font-size: 48px;
-    font-weight: bold;
-    color: var(--secondary-color);
-    letter-spacing: 8px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
     padding: 20px;
     background: rgba(212, 175, 55, 0.1);
     border: 3px solid var(--secondary-color);
     border-radius: 10px;
     margin: 20px 0;
+}
+
+.code-digit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 60px;
+    font-size: 36px;
+    font-weight: bold;
+    color: var(--secondary-color);
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
     text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    animation: digitAppear 0.3s ease forwards;
+    opacity: 0;
+}
+
+.code-digit:nth-child(1) { animation-delay: 0.05s; }
+.code-digit:nth-child(2) { animation-delay: 0.1s; }
+.code-digit:nth-child(3) { animation-delay: 0.15s; }
+.code-digit:nth-child(4) { animation-delay: 0.2s; }
+.code-digit:nth-child(5) { animation-delay: 0.25s; }
+.code-digit:nth-child(6) { animation-delay: 0.3s; }
+
+@keyframes digitAppear {
+    0% { opacity: 0; transform: scale(0.5) rotateY(90deg); }
+    100% { opacity: 1; transform: scale(1) rotateY(0deg); }
+}
+
+/* Copy Code Button */
+.copy-code-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 24px;
+    background: rgba(212, 175, 55, 0.15);
+    border: 2px solid var(--secondary-color);
+    color: var(--secondary-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin: 10px 0;
+}
+
+.copy-code-btn:hover {
+    background: var(--secondary-color);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+
+.copy-code-btn.copied {
+    background: #4CAF50;
+    border-color: #4CAF50;
+    color: white;
 }
 
 .room-info {
     color: #aaa;
     font-size: 14px;
     margin: 10px 0;
+}
+
+/* Waiting Indicator */
+.waiting-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.waiting-spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(212, 175, 55, 0.2);
+    border-top: 3px solid var(--secondary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .waiting-text {
@@ -2005,13 +2091,135 @@ footer .owner-credit strong {
     50% { opacity: 0.5; }
 }
 
+/* Room Code Digit Inputs (OTP-style) */
+.room-code-label {
+    display: block;
+    color: var(--secondary-color);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.room-code-inputs {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    direction: ltr;
+    margin: 15px 0;
+}
+
+.room-digit-input {
+    width: 48px;
+    height: 56px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--secondary-color);
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 10px;
+    outline: none;
+    transition: all 0.3s ease;
+    caret-color: var(--secondary-color);
+}
+
+.room-digit-input:focus,
+.room-digit-input.focused {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+    background: rgba(212, 175, 55, 0.1);
+    transform: translateY(-2px);
+}
+
+.room-digit-input:not(:placeholder-shown) {
+    border-color: rgba(212, 175, 55, 0.6);
+}
+
+.room-code-separator {
+    font-size: 24px;
+    color: rgba(212, 175, 55, 0.5);
+    font-weight: bold;
+    margin: 0 2px;
+}
+
 .room-status {
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 5px;
+    margin-top: 15px;
+    padding: 10px 15px;
+    border-radius: 8px;
     text-align: center;
     font-weight: 600;
     min-height: 20px;
+    transition: all 0.3s ease;
+}
+
+.room-status-success {
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.room-status-error {
+    background: rgba(244, 67, 54, 0.1);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+/* Room Code Mobile Responsiveness */
+@media (max-width: 480px) {
+    .room-digit-input {
+        width: 40px;
+        height: 48px;
+        font-size: 20px;
+        border-radius: 8px;
+    }
+
+    .room-code-inputs {
+        gap: 5px;
+    }
+
+    .room-code-separator {
+        font-size: 20px;
+        margin: 0 1px;
+    }
+
+    .code-digit {
+        width: 40px;
+        height: 48px;
+        font-size: 28px;
+    }
+
+    .room-code-large {
+        gap: 5px;
+        padding: 15px 10px;
+    }
+}
+
+@media (max-width: 360px) {
+    .room-digit-input {
+        width: 34px;
+        height: 42px;
+        font-size: 18px;
+        border-radius: 6px;
+    }
+
+    .room-code-inputs {
+        gap: 4px;
+    }
+
+    .room-code-separator {
+        font-size: 16px;
+    }
+
+    .code-digit {
+        width: 34px;
+        height: 42px;
+        font-size: 22px;
+    }
+
+    .room-code-large {
+        gap: 4px;
+        padding: 12px 8px;
+    }
 }
 
 /* Local/Online Game Setup Toggle */

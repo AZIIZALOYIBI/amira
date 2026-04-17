@@ -126,9 +126,16 @@ class RoomManager {
         this.currentRoom = null;
     }
 
-    // Generate a random 6-digit room code
+    // Generate a random 6-digit room code (ensures uniqueness)
     generateRoomCode() {
-        return Math.floor(100000 + Math.random() * 900000).toString();
+        const rooms = this.getRooms();
+        let code;
+        let attempts = 0;
+        do {
+            code = Math.floor(100000 + Math.random() * 900000).toString();
+            attempts++;
+        } while (rooms[code] && attempts < 100);
+        return code;
     }
 
     // Get all active rooms

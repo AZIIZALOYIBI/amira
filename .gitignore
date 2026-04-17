@@ -2,6 +2,10 @@
 .DS_Store
 Thumbs.db
 
+# Node modules
+node_modules/
+package-lock.json
+
 # Editor files
 .vscode/
 .idea/

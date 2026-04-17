@@ -12,6 +12,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Load new modules -->
+    <script src="puzzles.js" defer></script>
+    <script src="achievements.js" defer></script>
+    <script src="savesystem.js" defer></script>
+    <script src="moveanalysis.js" defer></script>
 </head>
 <body>
     <!-- Login/Registration Modal -->
@@ -250,6 +256,9 @@
                     <button class="btn btn-secondary" id="loadBtn">تحميل لعبة</button>
                     <button class="btn btn-secondary" id="exportBtn">تصدير PGN</button>
                     <button class="btn btn-secondary" id="statsBtn">📊 الإحصائيات</button>
+                    <button class="btn btn-secondary" id="puzzlesBtn">🧩 الألغاز</button>
+                    <button class="btn btn-secondary" id="achievementsBtn">🏆 الإنجازات</button>
+                    <button class="btn btn-secondary" id="analysisBtn">📈 التحليل</button>
                 </div>
 
                 <div class="settings">
@@ -320,6 +329,88 @@
             <p>تم التطوير باستخدام تقنيات عالية واحترافية ✨ تصميم فاخر للعب الاحترافي</p>
             <p class="owner-credit">صاحب الموقع: <strong>عبدالعزيز بن سلطان</strong></p>
         </footer>
+    </div>
+
+    <!-- AI Thinking Indicator -->
+    <div class="ai-thinking-indicator" id="aiThinkingIndicator" style="display: none;">
+        <div class="thinking-content">
+            <div class="thinking-spinner"></div>
+            <p>🤖 الذكاء الاصطناعي يفكر...</p>
+        </div>
+    </div>
+
+    <!-- Puzzles Modal -->
+    <div class="game-setup-modal" id="puzzlesModal">
+        <div class="game-setup-content">
+            <h2>🧩 ألغاز الشطرنج</h2>
+            <div id="puzzleContent" class="puzzle-content">
+                <div class="puzzle-header">
+                    <h3 id="puzzleTitle">لغز اليوم</h3>
+                    <span id="puzzleDifficulty" class="puzzle-difficulty">متوسط</span>
+                </div>
+                <p id="puzzleDescription">حل اللغز للحصول على نقاط!</p>
+                <div class="puzzle-stats">
+                    <div>محلولة: <span id="puzzlesSolvedCount">0</span></div>
+                    <div>السلسلة: <span id="puzzleStreak">0</span></div>
+                </div>
+                <div class="puzzle-buttons">
+                    <button class="btn btn-primary" id="dailyPuzzleBtn">لغز اليوم</button>
+                    <button class="btn btn-secondary" id="randomPuzzleBtn">لغز عشوائي</button>
+                    <button class="btn btn-secondary" id="puzzleHintBtn">💡 تلميح</button>
+                    <button class="btn btn-secondary" id="closePuzzlesBtn">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievements Modal -->
+    <div class="game-setup-modal" id="achievementsModal">
+        <div class="game-setup-content">
+            <h2>🏆 الإنجازات</h2>
+            <div id="achievementsContent" class="achievements-content">
+                <div class="achievements-progress">
+                    <p>التقدم: <span id="achievementsProgress">0/15</span></p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="achievementsProgressBar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="achievements-grid" id="achievementsGrid"></div>
+                <button class="btn btn-secondary" id="closeAchievementsBtn">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analysis Modal -->
+    <div class="game-setup-modal" id="analysisModal">
+        <div class="game-setup-content">
+            <h2>📈 تحليل اللعبة</h2>
+            <div id="analysisContent" class="analysis-content">
+                <div class="position-evaluation">
+                    <h3>تقييم الموقف</h3>
+                    <div id="positionEval"></div>
+                </div>
+                <div class="move-quality">
+                    <h3>جودة آخر حركة</h3>
+                    <div id="lastMoveAnalysis"></div>
+                </div>
+                <div class="suggestions">
+                    <h3>حركات مقترحة</h3>
+                    <div id="moveSuggestions"></div>
+                </div>
+                <button class="btn btn-secondary" id="closeAnalysisBtn">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievement Notification -->
+    <div class="achievement-notification" id="achievementNotification" style="display: none;">
+        <div class="notification-content">
+            <span class="achievement-icon" id="notificationIcon">🏆</span>
+            <div class="notification-text">
+                <h4>إنجاز جديد!</h4>
+                <p id="notificationText">لقد حصلت على إنجاز جديد</p>
+            </div>
+        </div>
     </div>
 
     <script src="auth.js"></script>

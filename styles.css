@@ -590,6 +590,19 @@ footer {
     opacity: 0.9;
 }
 
+footer .owner-credit {
+    margin-top: 10px;
+    font-size: 0.95em;
+    color: rgba(212, 175, 55, 0.9);
+    font-weight: 400;
+}
+
+footer .owner-credit strong {
+    color: var(--primary-color);
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
 /* Player Name Input */
 .player-name-input {
     width: 100%;

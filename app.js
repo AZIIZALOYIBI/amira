@@ -444,7 +444,7 @@ class ChessUI {
                 }
             } else {
                 // Join existing room
-                const roomCode = document.getElementById('roomCodeInput').value.trim();
+                const roomCode = this.getRoomCodeFromInputs() || document.getElementById('roomCodeInput').value.trim();
                 const result = this.roomManager.joinRoom(roomCode, user.username, user.displayName);
 
                 const statusEl = document.getElementById('roomStatus');

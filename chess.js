@@ -608,6 +608,13 @@ class ChessGame {
             this.gameOver = gameData.gameOver;
             this.checkState = gameData.checkState;
 
+            // Restore last move if it exists in the move history
+            if (this.moveHistory.length > 0) {
+                this.lastMove = this.moveHistory[this.moveHistory.length - 1];
+            } else {
+                this.lastMove = null;
+            }
+
             // Rebuild state history
             this.gameStateHistory = [];
             this.redoStack = [];

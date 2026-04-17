@@ -940,9 +940,19 @@ class ChessUI {
     resetGame() {
         this.game.reset();
         this.selectedSquare = null;
-        this.timers = { white: 600, black: 600 };
+        // Reset timers based on current game mode
+        const timers = {
+            classic: 600,  // 10 minutes
+            rapid: 300,    // 5 minutes
+            blitz: 180,    // 3 minutes
+            unlimited: 0   // No timer
+        };
+        this.timers = {
+            white: timers[this.gameMode] || 600,
+            black: timers[this.gameMode] || 600
+        };
         this.stopTimer();
-        if (this.timerEnabled) {
+        if (this.timerEnabled && this.gameMode !== 'unlimited') {
             this.startTimer();
         }
         this.renderBoard();
@@ -952,19 +962,41 @@ class ChessUI {
 
     undoMove() {
         if (this.game.undo()) {
+            // If timer is running, pause it during undo
+            const wasRunning = this.timerInterval !== null;
+            if (wasRunning) {
+                this.stopTimer();
+            }
+
             this.playSound('move');
             this.renderBoard();
             this.updateGameStatus();
             this.deselectSquare();
+
+            // Resume timer if it was running and game is not over
+            if (wasRunning && this.timerEnabled && !this.game.gameOver) {
+                this.startTimer();
+            }
         }
     }
 
     redoMove() {
         if (this.game.redo()) {
+            // If timer is running, pause it during redo
+            const wasRunning = this.timerInterval !== null;
+            if (wasRunning) {
+                this.stopTimer();
+            }
+
             this.playSound('move');
             this.renderBoard();
             this.updateGameStatus();
             this.deselectSquare();
+
+            // Resume timer if it was running and game is not over
+            if (wasRunning && this.timerEnabled && !this.game.gameOver) {
+                this.startTimer();
+            }
         }
     }
 
@@ -998,6 +1030,13 @@ class ChessUI {
                 if (this.game.loadFromLocalStorage(games[index].slot)) {
                     this.renderBoard();
                     this.updateGameStatus();
+                    this.updateTimerDisplay();
+                    this.deselectSquare();
+                    // Restart timer if enabled and game not over
+                    if (this.timerEnabled && !this.game.gameOver) {
+                        this.stopTimer();
+                        this.startTimer();
+                    }
                     alert('✅ تم تحميل اللعبة بنجاح!');
                 } else {
                     alert('❌ فشل تحميل اللعبة');

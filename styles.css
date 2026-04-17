@@ -297,13 +297,105 @@ header h1 {
     margin-bottom: 15px;
     font-weight: 700;
     animation: slideDownBounce 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    filter: drop-shadow(0 4px 8px rgba(107, 154, 196, 0.4));
+    letter-spacing: 3px;
+    line-height: 1.2;
+}
+
+/* Creative Amira Name Styling */
+.amira-title {
+    position: relative;
+    display: inline-block;
+}
+
+.amira-name {
+    background: linear-gradient(135deg, #6b9ac4 0%, #4a7ba7 25%, #a0d1f0 50%, #6b9ac4 75%, #4a7ba7 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 3s ease infinite, pulseGlow 2s ease-in-out infinite;
+    font-weight: 800;
+    position: relative;
+    display: inline-block;
+    text-shadow: 0 0 20px rgba(107, 154, 196, 0.5);
+    filter: drop-shadow(0 0 15px rgba(107, 154, 196, 0.6))
+            drop-shadow(0 0 30px rgba(160, 209, 240, 0.4));
+}
+
+.amira-name::before {
+    content: 'Amira';
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    background: linear-gradient(135deg, rgba(107, 154, 196, 0.4), rgba(160, 209, 240, 0.6));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: blur(10px);
+    animation: glowPulse 2s ease-in-out infinite;
+}
+
+.chess-name {
     background: var(--gold-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    filter: drop-shadow(0 4px 8px rgba(107, 154, 196, 0.4));
-    letter-spacing: 3px;
-    line-height: 1.2;
+    font-weight: 600;
+    opacity: 0.95;
+}
+
+/* Hover effect for the entire title */
+.amira-title:hover .amira-name {
+    animation: gradientShift 1.5s ease infinite,
+               pulseGlow 1s ease-in-out infinite,
+               letterFloat 0.6s ease-in-out;
+    transform: scale(1.05);
+}
+
+/* Gradient Animation */
+@keyframes gradientShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* Glow Pulse Animation */
+@keyframes glowPulse {
+    0%, 100% {
+        opacity: 0.6;
+        filter: blur(8px);
+    }
+    50% {
+        opacity: 1;
+        filter: blur(15px);
+    }
+}
+
+/* Pulse Glow for Text */
+@keyframes pulseGlow {
+    0%, 100% {
+        filter: drop-shadow(0 0 10px rgba(107, 154, 196, 0.4))
+                drop-shadow(0 0 20px rgba(160, 209, 240, 0.3));
+    }
+    50% {
+        filter: drop-shadow(0 0 20px rgba(107, 154, 196, 0.8))
+                drop-shadow(0 0 40px rgba(160, 209, 240, 0.6));
+    }
+}
+
+/* Letter Float Animation */
+@keyframes letterFloat {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-8px) scale(1.08);
+    }
 }
 
 header .subtitle {
@@ -1477,6 +1569,24 @@ footer .owner-credit strong {
 
     header h1 {
         font-size: 2.5em;
+    }
+
+    /* Optimize Amira name animations for mobile */
+    .amira-name {
+        animation: gradientShift 3s ease infinite;
+        filter: drop-shadow(0 0 10px rgba(107, 154, 196, 0.5));
+    }
+
+    .amira-name::before {
+        filter: blur(6px);
+    }
+
+    /* Disable hover animations on mobile for better performance */
+    @media (hover: none) {
+        .amira-title:hover .amira-name {
+            animation: gradientShift 3s ease infinite;
+            transform: none;
+        }
     }
 
     .chess-board {

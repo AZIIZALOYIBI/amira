@@ -2,6 +2,8 @@
 class ChessUI {
     constructor() {
         this.game = new ChessGame();
+        this.stats = new ChessStatistics();
+        this.openingRecognizer = new OpeningRecognizer();
         this.boardElement = document.getElementById('chessBoard');
         this.selectedSquare = null;
         this.soundEnabled = true;
@@ -63,11 +65,29 @@ class ChessUI {
         // Hide modal
         document.getElementById('gameSetupModal').classList.remove('active');
 
-        // Initialize game
-        this.init();
+        // Try to load autosaved game
+        const loadAutosave = confirm('هل تريد استعادة اللعبة المحفوظة تلقائياً؟');
+        if (loadAutosave && this.game.loadFromLocalStorage('autosave')) {
+            this.renderBoard();
+            this.updateGameStatus();
+            this.updateTimerDisplay();
+            if (this.timerEnabled) {
+                this.startTimer();
+            }
+        } else {
+            // Initialize new game
+            this.init();
+        }
     }
 
     init() {
+        // Load saved theme
+        const savedTheme = localStorage.getItem('chess_theme');
+        if (savedTheme) {
+            document.getElementById('themeSelector').value = savedTheme;
+            this.changeTheme(savedTheme);
+        }
+
         this.renderBoard();
         this.attachEventListeners();
         this.updateGameStatus();
@@ -146,8 +166,13 @@ class ChessUI {
         // Control buttons
         document.getElementById('newGameBtn').addEventListener('click', () => this.newGame());
         document.getElementById('undoBtn').addEventListener('click', () => this.undoMove());
+        document.getElementById('redoBtn').addEventListener('click', () => this.redoMove());
         document.getElementById('resetBtn').addEventListener('click', () => this.resetGame());
         document.getElementById('flipBoardBtn').addEventListener('click', () => this.flipBoard());
+        document.getElementById('saveBtn').addEventListener('click', () => this.saveGame());
+        document.getElementById('loadBtn').addEventListener('click', () => this.loadGame());
+        document.getElementById('exportBtn').addEventListener('click', () => this.exportPGN());
+        document.getElementById('statsBtn').addEventListener('click', () => this.showStats());
 
         // Settings
         document.getElementById('soundToggle').addEventListener('change', (e) => {
@@ -167,6 +192,50 @@ class ChessUI {
                 this.stopTimer();
             }
         });
+        document.getElementById('themeSelector').addEventListener('change', (e) => {
+            this.changeTheme(e.target.value);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key.toLowerCase()) {
+                    case 'z':
+                        e.preventDefault();
+                        this.undoMove();
+                        break;
+                    case 'y':
+                        e.preventDefault();
+                        this.redoMove();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        this.saveGame();
+                        break;
+                    case 'o':
+                        e.preventDefault();
+                        this.loadGame();
+                        break;
+                }
+            }
+            // Arrow keys for board navigation
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                this.undoMove();
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                this.redoMove();
+            }
+        });
+    }
+
+    changeTheme(theme) {
+        document.body.classList.remove('theme-classic', 'theme-blue', 'theme-green', 'theme-purple', 'theme-red');
+        if (theme !== 'default') {
+            document.body.classList.add(`theme-${theme}`);
+        }
+        localStorage.setItem('chess_theme', theme);
+        this.renderBoard(); // Re-render to apply new colors
     }
 
     handleSquareClick(e) {
@@ -252,6 +321,8 @@ class ChessUI {
             this.renderBoard();
             this.updateGameStatus();
             this.deselectSquare();
+            // Auto-save after each move
+            this.game.saveToLocalStorage('autosave');
         }
     }
 
@@ -567,10 +638,163 @@ class ChessUI {
     }
 
     undoMove() {
-        if (this.game.moveHistory.length === 0) return;
+        if (this.game.undo()) {
+            this.playSound('move');
+            this.renderBoard();
+            this.updateGameStatus();
+            this.deselectSquare();
+        }
+    }
 
-        // This is a simplified undo - a full implementation would need to restore all game state
-        alert('ميزة التراجع قيد التطوير');
+    redoMove() {
+        if (this.game.redo()) {
+            this.playSound('move');
+            this.renderBoard();
+            this.updateGameStatus();
+            this.deselectSquare();
+        }
+    }
+
+    saveGame() {
+        const slot = prompt('اسم حفظ اللعبة:', 'game_' + Date.now());
+        if (slot) {
+            if (this.game.saveToLocalStorage(slot)) {
+                alert('✅ تم حفظ اللعبة بنجاح!');
+            } else {
+                alert('❌ فشل حفظ اللعبة');
+            }
+        }
+    }
+
+    loadGame() {
+        const games = ChessGame.getSavedGames();
+        if (games.length === 0) {
+            alert('لا توجد ألعاب محفوظة');
+            return;
+        }
+
+        let message = 'اختر لعبة للتحميل:\n\n';
+        games.forEach((game, index) => {
+            message += `${index + 1}. ${game.slot} - ${game.moves} حركة\n`;
+        });
+
+        const choice = prompt(message + '\nأدخل رقم اللعبة:');
+        if (choice) {
+            const index = parseInt(choice) - 1;
+            if (index >= 0 && index < games.length) {
+                if (this.game.loadFromLocalStorage(games[index].slot)) {
+                    this.renderBoard();
+                    this.updateGameStatus();
+                    alert('✅ تم تحميل اللعبة بنجاح!');
+                } else {
+                    alert('❌ فشل تحميل اللعبة');
+                }
+            }
+        }
+    }
+
+    exportPGN() {
+        const pgn = this.game.toPGN(this.playerNames.white, this.playerNames.black);
+        const blob = new Blob([pgn], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `amira_chess_${Date.now()}.pgn`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        alert('✅ تم تصدير اللعبة بصيغة PGN!');
+    }
+
+    showStats() {
+        const stats = this.stats.getStats();
+        const statsModal = document.getElementById('statsModal');
+        const statsContent = document.getElementById('statsContent');
+
+        statsContent.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>🎮 الألعاب</h3>
+                    <div class="stat-value">${stats.gamesPlayed}</div>
+                    <div class="stat-label">إجمالي الألعاب</div>
+                </div>
+                <div class="stat-card">
+                    <h3>🏆 الفوز</h3>
+                    <div class="stat-value">${stats.wins.white + stats.wins.black}</div>
+                    <div class="stat-label">معدل: ${stats.winRate}%</div>
+                </div>
+                <div class="stat-card">
+                    <h3>⚔️ الأبيض</h3>
+                    <div class="stat-value">${stats.wins.white}/${stats.losses.white}</div>
+                    <div class="stat-label">${stats.whiteWinRate}% فوز</div>
+                </div>
+                <div class="stat-card">
+                    <h3>⚫ الأسود</h3>
+                    <div class="stat-value">${stats.wins.black}/${stats.losses.black}</div>
+                    <div class="stat-label">${stats.blackWinRate}% فوز</div>
+                </div>
+                <div class="stat-card">
+                    <h3>🤝 التعادل</h3>
+                    <div class="stat-value">${stats.draws}</div>
+                    <div class="stat-label">${stats.stalemates} جمود</div>
+                </div>
+                <div class="stat-card">
+                    <h3>📊 طول اللعبة</h3>
+                    <div class="stat-value">${stats.averageGameLength}</div>
+                    <div class="stat-label">متوسط الحركات</div>
+                </div>
+                <div class="stat-card">
+                    <h3>✅ الكش مات</h3>
+                    <div class="stat-value">${stats.checkmates}</div>
+                    <div class="stat-label">الانتصارات</div>
+                </div>
+                <div class="stat-card">
+                    <h3>⏱️ الوقت</h3>
+                    <div class="stat-value">${stats.timeouts}</div>
+                    <div class="stat-label">انتهى الوقت</div>
+                </div>
+            </div>
+            <div class="captured-stats">
+                <h3>القطع المأسورة</h3>
+                <div class="pieces-captured">
+                    <span>♟ ${stats.piecesCaptured.pawn}</span>
+                    <span>♞ ${stats.piecesCaptured.knight}</span>
+                    <span>♝ ${stats.piecesCaptured.bishop}</span>
+                    <span>♜ ${stats.piecesCaptured.rook}</span>
+                    <span>♛ ${stats.piecesCaptured.queen}</span>
+                </div>
+            </div>
+        `;
+
+        statsModal.classList.add('active');
+
+        // Add event listeners for stats modal buttons
+        document.getElementById('closeStatsBtn').onclick = () => {
+            statsModal.classList.remove('active');
+        };
+
+        document.getElementById('exportStatsBtn').onclick = () => {
+            const statsText = this.stats.exportStats();
+            const blob = new Blob([statsText], { type: 'text/plain; charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `امير-احصائيات-${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert('✅ تم تصدير الإحصائيات!');
+        };
+
+        document.getElementById('resetStatsBtn').onclick = () => {
+            if (confirm('هل أنت متأكد من إعادة تعيين جميع الإحصائيات؟')) {
+                this.stats.reset();
+                this.showStats(); // Refresh display
+                alert('✅ تم إعادة تعيين الإحصائيات');
+            }
+        };
     }
 }
 

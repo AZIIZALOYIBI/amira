@@ -63,6 +63,19 @@
         </div>
     </div>
 
+    <!-- Statistics Modal -->
+    <div class="game-setup-modal" id="statsModal">
+        <div class="game-setup-content">
+            <h2>📊 إحصائيات اللعب</h2>
+            <div id="statsContent" class="stats-content"></div>
+            <div class="stats-buttons">
+                <button class="btn btn-secondary" id="exportStatsBtn">تصدير الإحصائيات</button>
+                <button class="btn btn-secondary" id="resetStatsBtn">إعادة تعيين</button>
+                <button class="btn btn-primary" id="closeStatsBtn">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <h1>♔ Amira Chess ♚</h1>
@@ -85,8 +98,13 @@
                 <div class="game-controls">
                     <button class="btn btn-primary" id="newGameBtn">لعبة جديدة</button>
                     <button class="btn btn-secondary" id="undoBtn">تراجع</button>
+                    <button class="btn btn-secondary" id="redoBtn">إعادة</button>
                     <button class="btn btn-secondary" id="resetBtn">إعادة تعيين</button>
                     <button class="btn btn-secondary" id="flipBoardBtn">قلب اللوحة</button>
+                    <button class="btn btn-secondary" id="saveBtn">حفظ اللعبة</button>
+                    <button class="btn btn-secondary" id="loadBtn">تحميل لعبة</button>
+                    <button class="btn btn-secondary" id="exportBtn">تصدير PGN</button>
+                    <button class="btn btn-secondary" id="statsBtn">📊 الإحصائيات</button>
                 </div>
 
                 <div class="settings">
@@ -102,6 +120,17 @@
                     <label class="switch-label">
                         <input type="checkbox" id="timerToggle">
                         <span>تفعيل المؤقت</span>
+                    </label>
+                    <label class="switch-label">
+                        <span>ثيم اللوحة:</span>
+                        <select id="themeSelector" class="theme-select">
+                            <option value="default">ذهبي فاخر</option>
+                            <option value="classic">كلاسيكي</option>
+                            <option value="blue">أزرق</option>
+                            <option value="green">أخضر</option>
+                            <option value="purple">بنفسجي</option>
+                            <option value="red">أحمر</option>
+                        </select>
                     </label>
                 </div>
             </div>
@@ -147,6 +176,7 @@
     </div>
 
     <script src="chess.js"></script>
+    <script src="statistics.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

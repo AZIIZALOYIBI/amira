@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chess – Amira</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>♟ CHESS</h1>
+  <div id="status">White to move</div>
+
+  <div id="game-container">
+    <div id="board-wrapper">
+      <div id="board"></div>
+    </div>
+
+    <div id="side-panel">
+      <div id="controls">
+        <button id="new-game-btn">New Game</button>
+        <button id="flip-btn">Flip Board</button>
+      </div>
+
+      <div id="captured-pieces">
+        <h3>CAPTURED PIECES</h3>
+        <div class="captured-label">White captured:</div>
+        <div class="captured-row" id="captured-white"></div>
+        <div class="captured-label" style="margin-top:6px;">Black captured:</div>
+        <div class="captured-row" id="captured-black"></div>
+      </div>
+
+      <div id="move-history">
+        <h3>MOVE HISTORY</h3>
+        <ul id="moves-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pawn Promotion Modal -->
+  <div id="promotion-modal">
+    <div id="promotion-choices">
+      <h2>Promote Pawn</h2>
+      <div id="promotion-pieces"></div>
+    </div>
+  </div>
+
+  <script src="chess.js"></script>
+</body>
+</html>

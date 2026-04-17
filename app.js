@@ -2,6 +2,8 @@
 class ChessUI {
     constructor() {
         this.game = new ChessGame();
+        this.stats = new ChessStatistics();
+        this.openingRecognizer = new OpeningRecognizer();
         this.boardElement = document.getElementById('chessBoard');
         this.selectedSquare = null;
         this.soundEnabled = true;
@@ -170,6 +172,7 @@ class ChessUI {
         document.getElementById('saveBtn').addEventListener('click', () => this.saveGame());
         document.getElementById('loadBtn').addEventListener('click', () => this.loadGame());
         document.getElementById('exportBtn').addEventListener('click', () => this.exportPGN());
+        document.getElementById('statsBtn').addEventListener('click', () => this.showStats());
 
         // Settings
         document.getElementById('soundToggle').addEventListener('change', (e) => {
@@ -702,6 +705,96 @@ class ChessUI {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         alert('✅ تم تصدير اللعبة بصيغة PGN!');
+    }
+
+    showStats() {
+        const stats = this.stats.getStats();
+        const statsModal = document.getElementById('statsModal');
+        const statsContent = document.getElementById('statsContent');
+
+        statsContent.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>🎮 الألعاب</h3>
+                    <div class="stat-value">${stats.gamesPlayed}</div>
+                    <div class="stat-label">إجمالي الألعاب</div>
+                </div>
+                <div class="stat-card">
+                    <h3>🏆 الفوز</h3>
+                    <div class="stat-value">${stats.wins.white + stats.wins.black}</div>
+                    <div class="stat-label">معدل: ${stats.winRate}%</div>
+                </div>
+                <div class="stat-card">
+                    <h3>⚔️ الأبيض</h3>
+                    <div class="stat-value">${stats.wins.white}/${stats.losses.white}</div>
+                    <div class="stat-label">${stats.whiteWinRate}% فوز</div>
+                </div>
+                <div class="stat-card">
+                    <h3>⚫ الأسود</h3>
+                    <div class="stat-value">${stats.wins.black}/${stats.losses.black}</div>
+                    <div class="stat-label">${stats.blackWinRate}% فوز</div>
+                </div>
+                <div class="stat-card">
+                    <h3>🤝 التعادل</h3>
+                    <div class="stat-value">${stats.draws}</div>
+                    <div class="stat-label">${stats.stalemates} جمود</div>
+                </div>
+                <div class="stat-card">
+                    <h3>📊 طول اللعبة</h3>
+                    <div class="stat-value">${stats.averageGameLength}</div>
+                    <div class="stat-label">متوسط الحركات</div>
+                </div>
+                <div class="stat-card">
+                    <h3>✅ الكش مات</h3>
+                    <div class="stat-value">${stats.checkmates}</div>
+                    <div class="stat-label">الانتصارات</div>
+                </div>
+                <div class="stat-card">
+                    <h3>⏱️ الوقت</h3>
+                    <div class="stat-value">${stats.timeouts}</div>
+                    <div class="stat-label">انتهى الوقت</div>
+                </div>
+            </div>
+            <div class="captured-stats">
+                <h3>القطع المأسورة</h3>
+                <div class="pieces-captured">
+                    <span>♟ ${stats.piecesCaptured.pawn}</span>
+                    <span>♞ ${stats.piecesCaptured.knight}</span>
+                    <span>♝ ${stats.piecesCaptured.bishop}</span>
+                    <span>♜ ${stats.piecesCaptured.rook}</span>
+                    <span>♛ ${stats.piecesCaptured.queen}</span>
+                </div>
+            </div>
+        `;
+
+        statsModal.classList.add('active');
+
+        // Add event listeners for stats modal buttons
+        document.getElementById('closeStatsBtn').onclick = () => {
+            statsModal.classList.remove('active');
+        };
+
+        document.getElementById('exportStatsBtn').onclick = () => {
+            const statsText = this.stats.exportStats();
+            const blob = new Blob([statsText], { type: 'text/plain; charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `امير-احصائيات-${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert('✅ تم تصدير الإحصائيات!');
+        };
+
+        document.getElementById('resetStatsBtn').onclick = () => {
+            if (confirm('هل أنت متأكد من إعادة تعيين جميع الإحصائيات؟')) {
+                this.stats.reset();
+                this.showStats(); // Refresh display
+                alert('✅ تم إعادة تعيين الإحصائيات');
+            }
+        };
     }
 }
 

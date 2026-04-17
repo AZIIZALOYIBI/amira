@@ -52,17 +52,17 @@ html {
 
 :root {
     --primary-color: #1a1a2e;
-    --secondary-color: #d4af37;
-    --accent-color: #c9a236;
-    --light-square: #f5e6d3;
-    --dark-square: #8b6f47;
-    --highlight-color: rgba(212, 175, 55, 0.4);
-    --valid-move: rgba(212, 175, 55, 0.5);
+    --secondary-color: #6b9ac4;
+    --accent-color: #4a7ba7;
+    --light-square: #f5f7fa;
+    --dark-square: #a8c5dd;
+    --highlight-color: rgba(107, 154, 196, 0.4);
+    --valid-move: rgba(107, 154, 196, 0.5);
     --check-color: rgba(220, 53, 69, 0.6);
-    --bg-gradient: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    --bg-gradient: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
     --shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
-    --gold-gradient: linear-gradient(135deg, #d4af37 0%, #f4e8c1 50%, #d4af37 100%);
-    --luxury-shadow: 0 8px 32px rgba(212, 175, 55, 0.3);
+    --gold-gradient: linear-gradient(135deg, #6b9ac4 0%, #d4e8f7 50%, #6b9ac4 100%);
+    --luxury-shadow: 0 8px 32px rgba(107, 154, 196, 0.3);
 }
 
 /* Theme: Classic Brown */
@@ -135,9 +135,9 @@ body::before {
     width: 100%;
     height: 100%;
     background-image:
-        radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 40% 20%, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+        radial-gradient(circle at 20% 50%, rgba(107, 154, 196, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(107, 154, 196, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(107, 154, 196, 0.05) 0%, transparent 50%);
     animation: shimmer 15s ease-in-out infinite;
     pointer-events: none;
     z-index: 0;

@@ -6,6 +6,7 @@ class ChessUI {
         this.openingRecognizer = new OpeningRecognizer();
         this.auth = new AuthSystem();
         this.roomManager = new RoomManager();
+        this.ai = new ChessAI('medium'); // AI engine
         this.boardElement = document.getElementById('chessBoard');
         this.selectedSquare = null;
         this.soundEnabled = true;
@@ -16,8 +17,11 @@ class ChessUI {
         this.timerInterval = null;
         this.playerNames = { white: 'اللاعب الأبيض', black: 'اللاعب الأسود' };
         this.gameMode = 'classic';
-        this.gameType = 'local'; // local or online
+        this.gameType = 'local'; // local, computer, or online
         this.roomAction = 'create'; // create or join
+        this.playerColor = 'white'; // for computer games
+        this.aiDifficulty = 'medium';
+        this.isAiThinking = false;
 
         this.pieceSymbols = {
             white: { king: '♔', queen: '♕', rook: '♖', bishop: '♗', knight: '♘', pawn: '♙' },
@@ -149,12 +153,16 @@ class ChessUI {
                 option.classList.add('selected');
                 this.gameType = option.dataset.type;
 
-                // Toggle visibility of local/online setup
+                // Toggle visibility of local/computer/online setup
+                document.getElementById('localGameSetup').style.display = 'none';
+                document.getElementById('computerGameSetup').style.display = 'none';
+                document.getElementById('onlineGameSetup').style.display = 'none';
+
                 if (this.gameType === 'local') {
                     document.getElementById('localGameSetup').style.display = 'block';
-                    document.getElementById('onlineGameSetup').style.display = 'none';
-                } else {
-                    document.getElementById('localGameSetup').style.display = 'none';
+                } else if (this.gameType === 'computer') {
+                    document.getElementById('computerGameSetup').style.display = 'block';
+                } else if (this.gameType === 'online') {
                     document.getElementById('onlineGameSetup').style.display = 'block';
                 }
             });
@@ -194,6 +202,23 @@ class ChessUI {
             // Local game setup
             this.playerNames.white = document.getElementById('whitePlayerName').value || 'اللاعب الأبيض';
             this.playerNames.black = document.getElementById('blackPlayerName').value || 'اللاعب الأسود';
+        } else if (this.gameType === 'computer') {
+            // Computer game setup
+            this.playerColor = document.getElementById('playerColorSelect').value;
+            this.aiDifficulty = document.getElementById('aiDifficultySelect').value;
+            const playerName = document.getElementById('playerNameInput').value || user.displayName || 'أنت';
+
+            // Set AI difficulty
+            this.ai.setDifficulty(this.aiDifficulty);
+
+            // Set player names based on color choice
+            if (this.playerColor === 'white') {
+                this.playerNames.white = playerName;
+                this.playerNames.black = `الكمبيوتر (${this.getDifficultyLabel(this.aiDifficulty)})`;
+            } else {
+                this.playerNames.white = `الكمبيوتر (${this.getDifficultyLabel(this.aiDifficulty)})`;
+                this.playerNames.black = playerName;
+            }
         } else {
             // Online game setup with room code
             if (this.roomAction === 'create') {
@@ -274,6 +299,15 @@ class ChessUI {
         this.init();
     }
 
+    getDifficultyLabel(difficulty) {
+        const labels = {
+            easy: 'سهل',
+            medium: 'متوسط',
+            hard: 'صعب'
+        };
+        return labels[difficulty] || 'متوسط';
+    }
+
     pollForGuest(roomCode) {
         const pollInterval = setInterval(() => {
             const room = this.roomManager.getRoom(roomCode);
@@ -314,6 +348,11 @@ class ChessUI {
         this.updateTimerDisplay();
         if (this.timerEnabled) {
             this.startTimer();
+        }
+
+        // If playing against computer and computer goes first
+        if (this.gameType === 'computer' && this.playerColor === 'black') {
+            this.makeAIMove();
         }
     }
 
@@ -552,7 +591,15 @@ class ChessUI {
     }
 
     handleSquareClick(e) {
-        if (this.game.gameOver) return;
+        if (this.game.gameOver || this.isAiThinking) return;
+
+        // Don't allow clicks if it's AI's turn in computer mode
+        if (this.gameType === 'computer') {
+            const aiColor = this.playerColor === 'white' ? 'black' : 'white';
+            if (this.game.currentPlayer === aiColor) {
+                return;
+            }
+        }
 
         const square = e.target.closest('.square');
         if (!square) return;
@@ -635,8 +682,55 @@ class ChessUI {
             this.updateGameStatus();
             this.deselectSquare();
             // Auto-save after each move
-            this.game.saveToLocalStorage('autosave');
+            if (this.gameType === 'local') {
+                this.game.saveToLocalStorage('autosave');
+            }
+
+            // Trigger AI move if playing against computer
+            if (this.gameType === 'computer' && !this.game.gameOver) {
+                const aiColor = this.playerColor === 'white' ? 'black' : 'white';
+                if (this.game.currentPlayer === aiColor) {
+                    this.makeAIMove();
+                }
+            }
         }
+    }
+
+    makeAIMove() {
+        if (this.isAiThinking || this.game.gameOver) return;
+
+        this.isAiThinking = true;
+        const aiColor = this.playerColor === 'white' ? 'black' : 'white';
+
+        // Show thinking indicator
+        document.getElementById('gameMessage').textContent = '🤖 الكمبيوتر يفكر...';
+
+        // Use setTimeout to allow UI to update
+        setTimeout(() => {
+            const bestMove = this.ai.getBestMove(this.game, aiColor);
+
+            if (bestMove) {
+                const result = this.game.makeMove(
+                    bestMove.fromRow,
+                    bestMove.fromCol,
+                    bestMove.toRow,
+                    bestMove.toCol
+                );
+
+                if (result.promotion) {
+                    // Auto-promote to queen for AI
+                    this.game.promotePawn(result.row, result.col, 'queen');
+                    this.game.switchPlayer();
+                    this.game.saveState();
+                }
+
+                this.playSound('move');
+                this.renderBoard();
+                this.updateGameStatus();
+            }
+
+            this.isAiThinking = false;
+        }, 100);
     }
 
     showPromotionDialog(row, col) {
@@ -659,6 +753,14 @@ class ChessUI {
                 this.renderBoard();
                 this.updateGameStatus();
                 this.deselectSquare();
+
+                // Trigger AI move if playing against computer
+                if (this.gameType === 'computer' && !this.game.gameOver) {
+                    const aiColor = this.playerColor === 'white' ? 'black' : 'white';
+                    if (this.game.currentPlayer === aiColor) {
+                        this.makeAIMove();
+                    }
+                }
             });
             piecesContainer.appendChild(pieceElement);
         });
@@ -667,6 +769,20 @@ class ChessUI {
     }
 
     handleDragStart(e) {
+        if (this.isAiThinking) {
+            e.preventDefault();
+            return;
+        }
+
+        // Don't allow drag if it's AI's turn in computer mode
+        if (this.gameType === 'computer') {
+            const aiColor = this.playerColor === 'white' ? 'black' : 'white';
+            if (this.game.currentPlayer === aiColor) {
+                e.preventDefault();
+                return;
+            }
+        }
+
         const square = e.target.closest('.square');
         if (!square) return;
 

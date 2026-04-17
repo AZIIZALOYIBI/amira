@@ -165,6 +165,448 @@ body.theme-cloud {
     --shadow-hover: 0 12px 32px rgba(61, 106, 148, 0.2), 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* Theme: Claude Orange - Professional & Creative (كلاود برتقالي احترافي) */
+body.theme-claude-orange {
+    /* Claude's signature orange palette with creative gradients */
+    --primary-color: #0f1419;
+    --secondary-color: #ff8c42;
+    --accent-color: #ff6b35;
+    --tertiary-color: #ffb380;
+    --light-square: #fff5ed;
+    --dark-square: #ffcaa8;
+    --highlight-color: rgba(255, 140, 66, 0.4);
+    --valid-move: rgba(255, 107, 53, 0.5);
+    --check-color: rgba(220, 38, 38, 0.65);
+
+    /* Creative orange gradients inspired by Claude */
+    --bg-gradient: linear-gradient(135deg, #fff5ed 0%, #ffe4cc 25%, #ffd4a8 50%, #ffb380 75%, #ff8c42 100%);
+    --gold-gradient: linear-gradient(135deg, #ff8c42 0%, #ffb380 50%, #ff6b35 100%);
+
+    /* Advanced glassmorphism effects */
+    --glass-bg: rgba(255, 245, 237, 0.12);
+    --glass-border: rgba(255, 140, 66, 0.25);
+    --glass-light: rgba(255, 245, 237, 0.15);
+    --glass-medium: rgba(255, 200, 150, 0.2);
+    --glass-strong: rgba(255, 140, 66, 0.25);
+
+    /* Professional shadow system with orange glow */
+    --shadow: 0 8px 32px rgba(255, 107, 53, 0.15), 0 4px 16px rgba(255, 140, 66, 0.1);
+    --shadow-hover: 0 16px 48px rgba(255, 107, 53, 0.25), 0 8px 24px rgba(255, 140, 66, 0.15);
+    --shadow-active: 0 4px 16px rgba(255, 140, 66, 0.12), 0 2px 8px rgba(255, 107, 53, 0.08);
+    --luxury-shadow: 0 12px 40px rgba(255, 107, 53, 0.3), 0 0 60px rgba(255, 140, 66, 0.2), 0 0 100px rgba(255, 180, 128, 0.1);
+
+    /* Text shadows for depth */
+    --text-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
+}
+
+/* Claude Orange Theme - Advanced Hover Effects */
+body.theme-claude-orange .btn:hover {
+    background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%);
+    box-shadow: 0 12px 40px rgba(255, 107, 53, 0.35), 0 0 30px rgba(255, 140, 66, 0.25);
+    transform: translateY(-2px) scale(1.02);
+}
+
+body.theme-claude-orange .btn-primary {
+    background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%);
+    border: 2px solid rgba(255, 180, 128, 0.3);
+    box-shadow: 0 8px 24px rgba(255, 107, 53, 0.3), 0 0 20px rgba(255, 140, 66, 0.15);
+}
+
+body.theme-claude-orange .btn-secondary {
+    background: rgba(255, 245, 237, 0.15);
+    border: 2px solid rgba(255, 140, 66, 0.3);
+    backdrop-filter: blur(12px);
+}
+
+body.theme-claude-orange .btn-secondary:hover {
+    background: rgba(255, 200, 150, 0.25);
+    border-color: rgba(255, 140, 66, 0.5);
+    box-shadow: 0 8px 24px rgba(255, 107, 53, 0.25);
+}
+
+/* Claude Orange - Chess Board Enhancements */
+body.theme-claude-orange .square.light {
+    background: linear-gradient(135deg, #fff5ed 0%, #ffefe0 100%);
+}
+
+body.theme-claude-orange .square.dark {
+    background: linear-gradient(135deg, #ffcaa8 0%, #ffb380 100%);
+}
+
+body.theme-claude-orange .square:hover {
+    box-shadow: inset 0 0 20px rgba(255, 140, 66, 0.2), 0 0 15px rgba(255, 107, 53, 0.15);
+    transform: scale(1.02);
+}
+
+body.theme-claude-orange .square.selected {
+    background: radial-gradient(circle, rgba(255, 140, 66, 0.5) 0%, rgba(255, 107, 53, 0.3) 100%);
+    box-shadow: 0 0 25px rgba(255, 107, 53, 0.5), inset 0 0 20px rgba(255, 140, 66, 0.3);
+    animation: pulseOrange 1.5s ease-in-out infinite;
+}
+
+body.theme-claude-orange .square.valid-move::after {
+    background: radial-gradient(circle, #ff8c42 0%, #ff6b35 100%);
+    box-shadow: 0 0 15px rgba(255, 140, 66, 0.6), 0 0 25px rgba(255, 107, 53, 0.4);
+}
+
+/* Claude Orange - Piece Glow Effect */
+body.theme-claude-orange .piece {
+    filter: drop-shadow(0 2px 6px rgba(255, 140, 66, 0.3));
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.theme-claude-orange .piece:hover {
+    filter: drop-shadow(0 4px 12px rgba(255, 107, 53, 0.5)) drop-shadow(0 0 20px rgba(255, 140, 66, 0.3));
+    transform: scale(1.1) translateY(-3px);
+}
+
+/* Claude Orange - Game Status Bar */
+body.theme-claude-orange .game-status {
+    background: rgba(255, 245, 237, 0.15);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 140, 66, 0.25);
+    box-shadow: 0 8px 32px rgba(255, 107, 53, 0.15), 0 0 50px rgba(255, 140, 66, 0.1);
+}
+
+/* Claude Orange - Control Panel Glass Effect */
+body.theme-claude-orange .controls {
+    background: rgba(255, 245, 237, 0.12);
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 140, 66, 0.2);
+    box-shadow: 0 12px 40px rgba(255, 107, 53, 0.15), 0 0 60px rgba(255, 140, 66, 0.08);
+}
+
+/* Claude Orange - Header Title Animation */
+body.theme-claude-orange .amira-title {
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 25%, #ffb380 50%, #ff8c42 75%, #ff6b35 100%);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientShiftOrange 4s ease infinite;
+    text-shadow: 0 0 30px rgba(255, 140, 66, 0.4), 0 0 60px rgba(255, 107, 53, 0.2);
+}
+
+/* Claude Orange - Pulsing Animation */
+@keyframes pulseOrange {
+    0%, 100% {
+        box-shadow: 0 0 25px rgba(255, 107, 53, 0.5), inset 0 0 20px rgba(255, 140, 66, 0.3);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(255, 107, 53, 0.7), inset 0 0 30px rgba(255, 140, 66, 0.5);
+        transform: scale(1.02);
+    }
+}
+
+/* Claude Orange - Gradient Animation */
+@keyframes gradientShiftOrange {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Claude Orange - Modal Styling */
+body.theme-claude-orange .modal-content {
+    background: rgba(255, 245, 237, 0.95);
+    backdrop-filter: blur(30px);
+    border: 2px solid rgba(255, 140, 66, 0.3);
+    box-shadow: 0 20px 60px rgba(255, 107, 53, 0.3), 0 0 100px rgba(255, 140, 66, 0.2);
+}
+
+/* Claude Orange - Responsive Optimization */
+@media (max-width: 768px) {
+    body.theme-claude-orange {
+        --bg-gradient: linear-gradient(135deg, #fff5ed 0%, #ffd4a8 50%, #ff8c42 100%);
+        --luxury-shadow: 0 8px 24px rgba(255, 107, 53, 0.25);
+    }
+
+    body.theme-claude-orange .square:hover {
+        transform: scale(1.01);
+    }
+}
+
+/* Claude Orange - Mode Selection Enhancement */
+body.theme-claude-orange .mode-option {
+    background: linear-gradient(145deg, rgba(255, 245, 237, 0.15), rgba(255, 225, 200, 0.1));
+    border-color: rgba(255, 140, 66, 0.2);
+}
+
+body.theme-claude-orange .mode-option:hover {
+    background: linear-gradient(145deg, rgba(255, 200, 150, 0.25), rgba(255, 180, 128, 0.15));
+    border-color: rgba(255, 140, 66, 0.4);
+    box-shadow: 0 6px 24px rgba(255, 107, 53, 0.25);
+}
+
+body.theme-claude-orange .mode-option.selected {
+    background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 50%, #ffb380 100%);
+    background-size: 200% 200%;
+    border-color: rgba(255, 180, 128, 0.4);
+    box-shadow: 0 12px 40px rgba(255, 107, 53, 0.35), 0 0 50px rgba(255, 140, 66, 0.25);
+}
+
+/* Claude Orange - Logo Enhancement */
+body.theme-claude-orange .site-logo {
+    box-shadow: 0 20px 60px rgba(255, 107, 53, 0.4), 0 0 80px rgba(255, 140, 66, 0.3), inset 0 0 30px rgba(255, 245, 237, 0.15);
+    border-color: rgba(255, 140, 66, 0.3);
+    background: linear-gradient(145deg, rgba(255, 245, 237, 0.1) 0%, rgba(255, 140, 66, 0.15) 100%);
+}
+
+body.theme-claude-orange .site-logo:hover {
+    box-shadow: 0 25px 80px rgba(255, 107, 53, 0.6), 0 0 100px rgba(255, 140, 66, 0.4), inset 0 0 40px rgba(255, 245, 237, 0.25);
+    border-color: rgba(255, 180, 128, 0.6);
+}
+
+/* Claude Orange - Presentation Showcase */
+body.theme-claude-orange .presentation-showcase {
+    background: linear-gradient(145deg, rgba(255, 245, 237, 0.15) 0%, rgba(255, 220, 180, 0.1) 100%);
+    border-color: rgba(255, 140, 66, 0.2);
+    box-shadow: 0 12px 40px rgba(255, 107, 53, 0.1), inset 0 0 80px rgba(255, 140, 66, 0.05);
+}
+
+body.theme-claude-orange .presentation-showcase::before {
+    background: radial-gradient(circle, rgba(255, 140, 66, 0.5) 0%, transparent 70%);
+}
+
+body.theme-claude-orange .presentation-showcase::after {
+    background: radial-gradient(circle, rgba(255, 180, 128, 0.5) 0%, transparent 70%);
+}
+
+body.theme-claude-orange .presentation-pill {
+    background: linear-gradient(135deg, rgba(255, 140, 66, 0.25), rgba(255, 107, 53, 0.15));
+    color: #ff6b35;
+    border: 1px solid rgba(255, 140, 66, 0.3);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.15);
+}
+
+body.theme-claude-orange .presentation-pill:hover {
+    background: linear-gradient(135deg, rgba(255, 140, 66, 0.4), rgba(255, 107, 53, 0.25));
+    box-shadow: 0 6px 18px rgba(255, 107, 53, 0.25);
+    transform: translateY(-2px);
+}
+
+/* Claude Orange - Timer and Move History */
+body.theme-claude-orange .timer {
+    background: rgba(255, 245, 237, 0.15);
+    border: 2px solid rgba(255, 140, 66, 0.3);
+    box-shadow: 0 4px 16px rgba(255, 107, 53, 0.15);
+}
+
+body.theme-claude-orange .move-history {
+    background: rgba(255, 245, 237, 0.1);
+    border: 1px solid rgba(255, 140, 66, 0.2);
+    backdrop-filter: blur(15px);
+}
+
+body.theme-claude-orange .move-item {
+    border-bottom-color: rgba(255, 140, 66, 0.15);
+}
+
+body.theme-claude-orange .move-item:hover {
+    background: rgba(255, 200, 150, 0.15);
+    border-left: 3px solid #ff8c42;
+}
+
+/* Claude Orange - Settings Panel */
+body.theme-claude-orange .settings {
+    background: rgba(255, 245, 237, 0.1);
+    border: 1px solid rgba(255, 140, 66, 0.2);
+    backdrop-filter: blur(15px);
+}
+
+body.theme-claude-orange .theme-select {
+    background: rgba(255, 245, 237, 0.15);
+    border-color: rgba(255, 140, 66, 0.3);
+    color: #ff6b35;
+}
+
+body.theme-claude-orange .theme-select:focus {
+    border-color: rgba(255, 140, 66, 0.5);
+    box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.15);
+}
+
+/* Claude Orange - Promotion Dialog */
+body.theme-claude-orange .promotion-dialog {
+    background: rgba(255, 245, 237, 0.98);
+    backdrop-filter: blur(25px);
+    border: 2px solid rgba(255, 140, 66, 0.3);
+    box-shadow: 0 16px 48px rgba(255, 107, 53, 0.3);
+}
+
+body.theme-claude-orange .promotion-piece:hover {
+    background: rgba(255, 200, 150, 0.3);
+    border-color: rgba(255, 140, 66, 0.5);
+    transform: scale(1.15) translateY(-4px);
+    box-shadow: 0 8px 24px rgba(255, 107, 53, 0.3);
+}
+
+/* Claude Orange - Captured Pieces */
+body.theme-claude-orange .captured-pieces {
+    background: rgba(255, 245, 237, 0.1);
+    border: 1px solid rgba(255, 140, 66, 0.2);
+}
+
+body.theme-claude-orange .captured-piece {
+    filter: drop-shadow(0 2px 4px rgba(255, 140, 66, 0.2));
+}
+
+/* Claude Orange - Achievement Notification */
+body.theme-claude-orange .achievement-notification {
+    background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%);
+    box-shadow: 0 8px 32px rgba(255, 107, 53, 0.4), 0 0 60px rgba(255, 140, 66, 0.3);
+}
+
+/* Claude Orange - Advanced Glow Effects */
+body.theme-claude-orange .square.check {
+    background: radial-gradient(circle, rgba(220, 38, 38, 0.6) 0%, rgba(255, 107, 53, 0.3) 100%);
+    animation: checkPulseOrange 1s ease-in-out infinite;
+}
+
+@keyframes checkPulseOrange {
+    0%, 100% {
+        box-shadow: 0 0 30px rgba(220, 38, 38, 0.6), inset 0 0 25px rgba(255, 107, 53, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 50px rgba(220, 38, 38, 0.8), inset 0 0 40px rgba(255, 107, 53, 0.5);
+    }
+}
+
+/* Claude Orange - Text and Typography Enhancements */
+body.theme-claude-orange .subtitle {
+    color: #ff8c42;
+    text-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+}
+
+body.theme-claude-orange .current-turn {
+    color: rgba(255, 245, 237, 0.95);
+}
+
+body.theme-claude-orange .current-turn strong {
+    color: #ffb380;
+    text-shadow: 0 0 15px rgba(255, 140, 66, 0.6), 0 2px 8px rgba(255, 107, 53, 0.4);
+}
+
+body.theme-claude-orange .game-message {
+    color: #ff6b35;
+    text-shadow: 0 2px 10px rgba(255, 107, 53, 0.4);
+}
+
+body.theme-claude-orange h3 {
+    color: #ff8c42;
+    text-shadow: 0 2px 6px rgba(255, 107, 53, 0.2);
+}
+
+/* Claude Orange - Special Button Effects */
+body.theme-claude-orange #flipBoardBtn:hover,
+body.theme-claude-orange #newGameBtn:hover {
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 50%, #ffb380 100%);
+    box-shadow: 0 12px 40px rgba(255, 107, 53, 0.4), 0 0 40px rgba(255, 140, 66, 0.3);
+}
+
+/* Claude Orange - Stats and Achievements */
+body.theme-claude-orange .stat-value {
+    color: #ff8c42;
+    text-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+}
+
+body.theme-claude-orange .achievement-item {
+    background: linear-gradient(145deg, rgba(255, 245, 237, 0.15), rgba(255, 225, 200, 0.1));
+    border-color: rgba(255, 140, 66, 0.25);
+}
+
+body.theme-claude-orange .achievement-item.unlocked {
+    background: linear-gradient(135deg, rgba(255, 140, 66, 0.25), rgba(255, 107, 53, 0.15));
+    border-color: rgba(255, 140, 66, 0.4);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.25);
+}
+
+body.theme-claude-orange .achievement-icon {
+    text-shadow: 0 0 15px rgba(255, 140, 66, 0.5);
+    filter: drop-shadow(0 4px 8px rgba(255, 107, 53, 0.3));
+}
+
+/* Claude Orange - Puzzle Mode */
+body.theme-claude-orange .puzzle-card {
+    background: linear-gradient(145deg, rgba(255, 245, 237, 0.15), rgba(255, 225, 200, 0.1));
+    border: 1px solid rgba(255, 140, 66, 0.25);
+    box-shadow: 0 8px 24px rgba(255, 107, 53, 0.15);
+}
+
+body.theme-claude-orange .puzzle-card:hover {
+    border-color: rgba(255, 140, 66, 0.4);
+    box-shadow: 0 12px 32px rgba(255, 107, 53, 0.25);
+    transform: translateY(-3px);
+}
+
+body.theme-claude-orange .difficulty-badge {
+    background: linear-gradient(135deg, #ff8c42, #ff6b35);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+/* Claude Orange - Room Code Input */
+body.theme-claude-orange .room-code-digit {
+    background: rgba(255, 245, 237, 0.15);
+    border: 2px solid rgba(255, 140, 66, 0.3);
+    color: #ff6b35;
+}
+
+body.theme-claude-orange .room-code-digit:focus {
+    border-color: rgba(255, 140, 66, 0.6);
+    box-shadow: 0 0 0 3px rgba(255, 140, 66, 0.2), 0 4px 12px rgba(255, 107, 53, 0.25);
+}
+
+/* Claude Orange - Loading Spinner */
+body.theme-claude-orange .spinner {
+    border-color: rgba(255, 140, 66, 0.2);
+    border-top-color: #ff8c42;
+}
+
+/* Claude Orange - Scrollbar Styling */
+body.theme-claude-orange ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%);
+    box-shadow: inset 0 0 10px rgba(255, 107, 53, 0.4);
+}
+
+body.theme-claude-orange ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+}
+
+body.theme-claude-orange ::-webkit-scrollbar-track {
+    background: rgba(255, 245, 237, 0.1);
+}
+
+/* Claude Orange - Special Floating Particles Effect */
+body.theme-claude-orange::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+        radial-gradient(circle at 20% 30%, rgba(255, 140, 66, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 107, 53, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255, 180, 128, 0.04) 0%, transparent 50%);
+    animation: floatingParticles 15s ease-in-out infinite;
+}
+
+@keyframes floatingParticles {
+    0%, 100% {
+        opacity: 0.5;
+        transform: scale(1) translateY(0);
+    }
+    33% {
+        opacity: 0.7;
+        transform: scale(1.1) translateY(-10px);
+    }
+    66% {
+        opacity: 0.6;
+        transform: scale(0.95) translateY(5px);
+    }
+}
+
 body {
     font-family: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: var(--bg-gradient);

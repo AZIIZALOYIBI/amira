@@ -1,93 +1,49 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة الشطرنج - Amira Chess</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chess – Amira</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>♔ Amira Chess ♚</h1>
-            <p class="subtitle">لعبة الشطرنج الاحترافية</p>
-        </header>
+  <h1>♟ CHESS</h1>
+  <div id="status">White to move</div>
 
-        <div class="game-container">
-            <div class="sidebar left-sidebar">
-                <div class="player-info black-player">
-                    <div class="player-header">
-                        <h3>اللاعب الأسود</h3>
-                        <div class="timer" id="blackTimer">10:00</div>
-                    </div>
-                    <div class="captured-pieces" id="blackCaptured"></div>
-                </div>
-
-                <div class="game-controls">
-                    <button class="btn btn-primary" id="newGameBtn">لعبة جديدة</button>
-                    <button class="btn btn-secondary" id="undoBtn">تراجع</button>
-                    <button class="btn btn-secondary" id="resetBtn">إعادة تعيين</button>
-                    <button class="btn btn-secondary" id="flipBoardBtn">قلب اللوحة</button>
-                </div>
-
-                <div class="settings">
-                    <h3>الإعدادات</h3>
-                    <label class="switch-label">
-                        <input type="checkbox" id="soundToggle" checked>
-                        <span>تشغيل الأصوات</span>
-                    </label>
-                    <label class="switch-label">
-                        <input type="checkbox" id="highlightToggle" checked>
-                        <span>إبراز الحركات</span>
-                    </label>
-                    <label class="switch-label">
-                        <input type="checkbox" id="timerToggle">
-                        <span>تفعيل المؤقت</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="chess-board-container">
-                <div class="game-status" id="gameStatus">
-                    <span class="current-turn">دور اللاعب: <strong id="currentPlayer">الأبيض</strong></span>
-                    <span class="game-message" id="gameMessage"></span>
-                </div>
-
-                <div class="board-wrapper">
-                    <div class="chess-board" id="chessBoard"></div>
-                </div>
-
-                <div class="promotion-dialog" id="promotionDialog">
-                    <h3>اختر القطعة للترقية</h3>
-                    <div class="promotion-pieces" id="promotionPieces"></div>
-                </div>
-            </div>
-
-            <div class="sidebar right-sidebar">
-                <div class="player-info white-player">
-                    <div class="player-header">
-                        <h3>اللاعب الأبيض</h3>
-                        <div class="timer" id="whiteTimer">10:00</div>
-                    </div>
-                    <div class="captured-pieces" id="whiteCaptured"></div>
-                </div>
-
-                <div class="move-history">
-                    <h3>سجل الحركات</h3>
-                    <div class="moves-list" id="movesList"></div>
-                </div>
-            </div>
-        </div>
-
-        <footer>
-            <p>تم التطوير باستخدام تقنيات عالية واحترافية</p>
-        </footer>
+  <div id="game-container">
+    <div id="board-wrapper">
+      <div id="board"></div>
     </div>
 
-    <script src="chess.js"></script>
-    <script src="app.js"></script>
+    <div id="side-panel">
+      <div id="controls">
+        <button id="new-game-btn">New Game</button>
+        <button id="flip-btn">Flip Board</button>
+      </div>
+
+      <div id="captured-pieces">
+        <h3>CAPTURED PIECES</h3>
+        <div class="captured-label">White captured:</div>
+        <div class="captured-row" id="captured-white"></div>
+        <div class="captured-label" style="margin-top:6px;">Black captured:</div>
+        <div class="captured-row" id="captured-black"></div>
+      </div>
+
+      <div id="move-history">
+        <h3>MOVE HISTORY</h3>
+        <ul id="moves-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pawn Promotion Modal -->
+  <div id="promotion-modal">
+    <div id="promotion-choices">
+      <h2>Promote Pawn</h2>
+      <div id="promotion-pieces"></div>
+    </div>
+  </div>
+
+  <script src="chess.js"></script>
 </body>
 </html>

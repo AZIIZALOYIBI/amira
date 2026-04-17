@@ -4,6 +4,8 @@ class ChessUI {
         this.game = new ChessGame();
         this.stats = new ChessStatistics();
         this.openingRecognizer = new OpeningRecognizer();
+        this.auth = new AuthSystem();
+        this.roomManager = new RoomManager();
         this.boardElement = document.getElementById('chessBoard');
         this.selectedSquare = null;
         this.soundEnabled = true;
@@ -14,6 +16,8 @@ class ChessUI {
         this.timerInterval = null;
         this.playerNames = { white: 'اللاعب الأبيض', black: 'اللاعب الأسود' };
         this.gameMode = 'classic';
+        this.gameType = 'local'; // local or online
+        this.roomAction = 'create'; // create or join
 
         this.pieceSymbols = {
             white: { king: '♔', queen: '♕', rook: '♖', bishop: '♗', knight: '♘', pawn: '♙' },
@@ -24,12 +28,154 @@ class ChessUI {
     }
 
     initSetup() {
+        // Check if user is logged in
+        if (this.auth.isLoggedIn()) {
+            this.showGameSetup();
+        } else {
+            this.showLoginModal();
+        }
+        this.attachAuthListeners();
         this.attachSetupListeners();
+    }
+
+    showLoginModal() {
+        document.getElementById('loginModal').classList.add('active');
+        document.getElementById('gameSetupModal').classList.remove('active');
+    }
+
+    showGameSetup() {
+        document.getElementById('loginModal').classList.remove('active');
+        document.getElementById('gameSetupModal').classList.add('active');
+
+        const user = this.auth.getCurrentUser();
+        if (user) {
+            document.getElementById('currentUserDisplay').textContent = user.displayName;
+        }
+    }
+
+    attachAuthListeners() {
+        // Auth tab switching
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+                tab.classList.add('active');
+
+                const tabType = tab.dataset.tab;
+                document.getElementById(tabType + 'Form').classList.add('active');
+            });
+        });
+
+        // Login button
+        document.getElementById('loginBtn').addEventListener('click', () => this.handleLogin());
+
+        // Register button
+        document.getElementById('registerBtn').addEventListener('click', () => this.handleRegister());
+
+        // Logout button
+        document.getElementById('logoutBtn').addEventListener('click', () => this.handleLogout());
+
+        // Enter key for forms
+        document.getElementById('loginPassword').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.handleLogin();
+        });
+        document.getElementById('registerConfirmPassword').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.handleRegister();
+        });
+    }
+
+    handleLogin() {
+        const username = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('loginPassword').value;
+
+        const result = this.auth.login(username, password);
+        const messageEl = document.getElementById('loginMessage');
+
+        messageEl.textContent = result.message;
+        messageEl.style.color = result.success ? '#4CAF50' : '#f44336';
+
+        if (result.success) {
+            setTimeout(() => {
+                this.showGameSetup();
+                // Clear form
+                document.getElementById('loginUsername').value = '';
+                document.getElementById('loginPassword').value = '';
+                messageEl.textContent = '';
+            }, 1000);
+        }
+    }
+
+    handleRegister() {
+        const username = document.getElementById('registerUsername').value.trim();
+        const displayName = document.getElementById('registerDisplayName').value.trim();
+        const password = document.getElementById('registerPassword').value;
+        const confirmPassword = document.getElementById('registerConfirmPassword').value;
+
+        const result = this.auth.register(username, displayName, password, confirmPassword);
+        const messageEl = document.getElementById('registerMessage');
+
+        messageEl.textContent = result.message;
+        messageEl.style.color = result.success ? '#4CAF50' : '#f44336';
+
+        if (result.success) {
+            setTimeout(() => {
+                // Switch to login tab
+                document.querySelector('.auth-tab[data-tab="login"]').click();
+                // Clear form
+                document.getElementById('registerUsername').value = '';
+                document.getElementById('registerDisplayName').value = '';
+                document.getElementById('registerPassword').value = '';
+                document.getElementById('registerConfirmPassword').value = '';
+                messageEl.textContent = '';
+            }, 1500);
+        }
+    }
+
+    handleLogout() {
+        if (confirm('هل تريد تسجيل الخروج؟')) {
+            this.auth.logout();
+            this.showLoginModal();
+        }
     }
 
     attachSetupListeners() {
         // Game setup modal
         document.getElementById('startGameBtn').addEventListener('click', () => this.startGame());
+
+        // Game type selection
+        document.querySelectorAll('.game-type-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.game-type-option').forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                this.gameType = option.dataset.type;
+
+                // Toggle visibility of local/online setup
+                if (this.gameType === 'local') {
+                    document.getElementById('localGameSetup').style.display = 'block';
+                    document.getElementById('onlineGameSetup').style.display = 'none';
+                } else {
+                    document.getElementById('localGameSetup').style.display = 'none';
+                    document.getElementById('onlineGameSetup').style.display = 'block';
+                }
+            });
+        });
+
+        // Room code tabs
+        document.querySelectorAll('.room-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.room-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                this.roomAction = tab.dataset.action;
+
+                if (this.roomAction === 'create') {
+                    document.getElementById('roomCreate').classList.add('active');
+                    document.getElementById('roomJoin').classList.remove('active');
+                } else {
+                    document.getElementById('roomCreate').classList.remove('active');
+                    document.getElementById('roomJoin').classList.add('active');
+                }
+            });
+        });
 
         // Mode selection
         document.querySelectorAll('.mode-option').forEach(option => {
@@ -42,9 +188,54 @@ class ChessUI {
     }
 
     startGame() {
-        // Get player names
-        this.playerNames.white = document.getElementById('whitePlayerName').value || 'اللاعب الأبيض';
-        this.playerNames.black = document.getElementById('blackPlayerName').value || 'اللاعب الأسود';
+        const user = this.auth.getCurrentUser();
+
+        if (this.gameType === 'local') {
+            // Local game setup
+            this.playerNames.white = document.getElementById('whitePlayerName').value || 'اللاعب الأبيض';
+            this.playerNames.black = document.getElementById('blackPlayerName').value || 'اللاعب الأسود';
+        } else {
+            // Online game setup with room code
+            if (this.roomAction === 'create') {
+                // Create a new room
+                const result = this.roomManager.createRoom(user.username, user.displayName, this.gameMode);
+                if (result.success) {
+                    const roomCodeDisplay = document.getElementById('roomCodeDisplay');
+                    roomCodeDisplay.innerHTML = `
+                        <h3>كود الغرفة:</h3>
+                        <div class="room-code-large">${result.roomCode}</div>
+                        <p class="room-info">شارك هذا الكود مع الشخص الآخر للانضمام</p>
+                        <p class="waiting-text">في انتظار اللاعب الآخر...</p>
+                    `;
+
+                    // Set player names
+                    this.playerNames.white = user.displayName;
+                    this.playerNames.black = 'في الانتظار...';
+
+                    // Poll for guest joining
+                    this.pollForGuest(result.roomCode);
+                    return; // Don't start game yet
+                }
+            } else {
+                // Join existing room
+                const roomCode = document.getElementById('roomCodeInput').value.trim();
+                const result = this.roomManager.joinRoom(roomCode, user.username, user.displayName);
+
+                const statusEl = document.getElementById('roomStatus');
+                statusEl.textContent = result.message;
+                statusEl.style.color = result.success ? '#4CAF50' : '#f44336';
+
+                if (result.success) {
+                    // Set player names based on room
+                    this.playerNames.white = result.room.host.displayName;
+                    this.playerNames.black = user.displayName;
+
+                    // Continue with game setup below
+                } else {
+                    return; // Don't start game if join failed
+                }
+            }
+        }
 
         // Set timer based on game mode
         const timers = {
@@ -65,19 +256,48 @@ class ChessUI {
         // Hide modal
         document.getElementById('gameSetupModal').classList.remove('active');
 
-        // Try to load autosaved game
-        const loadAutosave = confirm('هل تريد استعادة اللعبة المحفوظة تلقائياً؟');
-        if (loadAutosave && this.game.loadFromLocalStorage('autosave')) {
-            this.renderBoard();
-            this.updateGameStatus();
-            this.updateTimerDisplay();
-            if (this.timerEnabled) {
-                this.startTimer();
+        // Try to load autosaved game only for local games
+        if (this.gameType === 'local') {
+            const loadAutosave = confirm('هل تريد استعادة اللعبة المحفوظة تلقائياً؟');
+            if (loadAutosave && this.game.loadFromLocalStorage('autosave')) {
+                this.renderBoard();
+                this.updateGameStatus();
+                this.updateTimerDisplay();
+                if (this.timerEnabled) {
+                    this.startTimer();
+                }
+                return;
             }
-        } else {
-            // Initialize new game
-            this.init();
         }
+
+        // Initialize new game
+        this.init();
+    }
+
+    pollForGuest(roomCode) {
+        const pollInterval = setInterval(() => {
+            const room = this.roomManager.getRoom(roomCode);
+
+            if (room && room.guest) {
+                clearInterval(pollInterval);
+
+                // Update player names
+                this.playerNames.black = room.guest.displayName;
+                document.getElementById('blackPlayerNameDisplay').textContent = this.playerNames.black;
+
+                // Hide modal and start game
+                document.getElementById('gameSetupModal').classList.remove('active');
+                alert(`انضم ${room.guest.displayName} إلى اللعبة!`);
+                this.init();
+            }
+
+            // Stop polling after 5 minutes
+            if (Date.now() - new Date(room.createdAt).getTime() > 5 * 60 * 1000) {
+                clearInterval(pollInterval);
+                alert('انتهت مهلة انتظار اللاعب الآخر');
+                this.roomManager.deleteRoom(roomCode);
+            }
+        }, 2000); // Poll every 2 seconds
     }
 
     init() {

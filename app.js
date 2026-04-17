@@ -63,11 +63,29 @@ class ChessUI {
         // Hide modal
         document.getElementById('gameSetupModal').classList.remove('active');
 
-        // Initialize game
-        this.init();
+        // Try to load autosaved game
+        const loadAutosave = confirm('هل تريد استعادة اللعبة المحفوظة تلقائياً؟');
+        if (loadAutosave && this.game.loadFromLocalStorage('autosave')) {
+            this.renderBoard();
+            this.updateGameStatus();
+            this.updateTimerDisplay();
+            if (this.timerEnabled) {
+                this.startTimer();
+            }
+        } else {
+            // Initialize new game
+            this.init();
+        }
     }
 
     init() {
+        // Load saved theme
+        const savedTheme = localStorage.getItem('chess_theme');
+        if (savedTheme) {
+            document.getElementById('themeSelector').value = savedTheme;
+            this.changeTheme(savedTheme);
+        }
+
         this.renderBoard();
         this.attachEventListeners();
         this.updateGameStatus();
@@ -171,6 +189,50 @@ class ChessUI {
                 this.stopTimer();
             }
         });
+        document.getElementById('themeSelector').addEventListener('change', (e) => {
+            this.changeTheme(e.target.value);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key.toLowerCase()) {
+                    case 'z':
+                        e.preventDefault();
+                        this.undoMove();
+                        break;
+                    case 'y':
+                        e.preventDefault();
+                        this.redoMove();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        this.saveGame();
+                        break;
+                    case 'o':
+                        e.preventDefault();
+                        this.loadGame();
+                        break;
+                }
+            }
+            // Arrow keys for board navigation
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                this.undoMove();
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                this.redoMove();
+            }
+        });
+    }
+
+    changeTheme(theme) {
+        document.body.classList.remove('theme-classic', 'theme-blue', 'theme-green', 'theme-purple', 'theme-red');
+        if (theme !== 'default') {
+            document.body.classList.add(`theme-${theme}`);
+        }
+        localStorage.setItem('chess_theme', theme);
+        this.renderBoard(); // Re-render to apply new colors
     }
 
     handleSquareClick(e) {
@@ -256,6 +318,8 @@ class ChessUI {
             this.renderBoard();
             this.updateGameStatus();
             this.deselectSquare();
+            // Auto-save after each move
+            this.game.saveToLocalStorage('autosave');
         }
     }
 

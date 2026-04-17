@@ -19,6 +19,45 @@
     --luxury-shadow: 0 8px 32px rgba(212, 175, 55, 0.3);
 }
 
+/* Theme: Classic Brown */
+body.theme-classic {
+    --light-square: #f0d9b5;
+    --dark-square: #b58863;
+    --secondary-color: #8b6f47;
+}
+
+/* Theme: Blue */
+body.theme-blue {
+    --light-square: #dee3e6;
+    --dark-square: #8ca2ad;
+    --secondary-color: #4a90a4;
+    --bg-gradient: linear-gradient(135deg, #0c1e29 0%, #1e3a5f 50%, #0f2439 100%);
+}
+
+/* Theme: Green */
+body.theme-green {
+    --light-square: #ffffdd;
+    --dark-square: #86a666;
+    --secondary-color: #5d8a3a;
+    --bg-gradient: linear-gradient(135deg, #1a2e1a 0%, #2d5a2d 50%, #1f3a1f 100%);
+}
+
+/* Theme: Purple */
+body.theme-purple {
+    --light-square: #e8d5e8;
+    --dark-square: #9370db;
+    --secondary-color: #8a2be2;
+    --bg-gradient: linear-gradient(135deg, #2a0e3a 0%, #5a2d7a 50%, #3a1a5a 100%);
+}
+
+/* Theme: Red */
+body.theme-red {
+    --light-square: #ffd7d7;
+    --dark-square: #c65d5d;
+    --secondary-color: #d32f2f;
+    --bg-gradient: linear-gradient(135deg, #3a0e0e 0%, #7a2d2d 50%, #5a1a1a 100%);
+}
+
 body {
     font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: var(--bg-gradient);
@@ -256,6 +295,31 @@ header .subtitle {
     width: 18px;
     height: 18px;
     cursor: pointer;
+}
+
+.theme-select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 2px solid var(--secondary-color);
+    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+    color: var(--primary-color);
+    font-family: inherit;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+}
+
+.theme-select:hover {
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+}
+
+.theme-select:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
 }
 
 .chess-board-container {

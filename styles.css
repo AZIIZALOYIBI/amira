@@ -16,7 +16,7 @@
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(107, 154, 196, 0.05);
+    background: rgba(107, 154, 196, 0.08);
     border-radius: 5px;
 }
 
@@ -33,7 +33,7 @@
 /* Firefox Scrollbar */
 * {
     scrollbar-width: thin;
-    scrollbar-color: var(--secondary-color) rgba(107, 154, 196, 0.05);
+    scrollbar-color: var(--secondary-color) rgba(107, 154, 196, 0.08);
 }
 
 /* Optimize scrolling performance */
@@ -78,21 +78,22 @@ html {
 }
 
 :root {
-    --primary-color: #1a1a2e;
+    /* Claude Colors Theme - Comfortable and Modern */
+    --primary-color: #1a1f2e;
     --secondary-color: #6b9ac4;
     --accent-color: #4a7ba7;
-    --light-square: #f5f7fa;
-    --dark-square: #a8c5dd;
-    --highlight-color: rgba(107, 154, 196, 0.4);
-    --valid-move: rgba(107, 154, 196, 0.5);
+    --light-square: #f8fafc;
+    --dark-square: #b0d0e8;
+    --highlight-color: rgba(107, 154, 196, 0.45);
+    --valid-move: rgba(74, 123, 167, 0.55);
     --check-color: rgba(220, 53, 69, 0.6);
-    --bg-gradient: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
-    --shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);
-    --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.15), 0 6px 12px rgba(0, 0, 0, 0.1);
-    --shadow-active: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.08);
+    --bg-gradient: linear-gradient(135deg, #e8f4fd 0%, #c5e3f6 50%, #a0d1f0 100%);
+    --shadow: 0 8px 24px rgba(74, 123, 167, 0.15), 0 4px 8px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 12px 32px rgba(74, 123, 167, 0.2), 0 6px 12px rgba(0, 0, 0, 0.1);
+    --shadow-active: 0 4px 12px rgba(74, 123, 167, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
     --gold-gradient: linear-gradient(135deg, #6b9ac4 0%, #d4e8f7 50%, #6b9ac4 100%);
-    --luxury-shadow: 0 8px 32px rgba(107, 154, 196, 0.3);
-    --text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --luxury-shadow: 0 10px 35px rgba(107, 154, 196, 0.35);
+    --text-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
     --border-radius-sm: 8px;
     --border-radius-md: 12px;
     --border-radius-lg: 20px;
@@ -140,17 +141,19 @@ body.theme-red {
     --bg-gradient: linear-gradient(135deg, #3a0e0e 0%, #7a2d2d 50%, #5a1a1a 100%);
 }
 
-/* Theme: Cloud (كلاود) */
+/* Theme: Cloud Alternative (كلاود بديل) */
 body.theme-cloud {
-    --light-square: #f5f7fa;
-    --dark-square: #a8c5dd;
-    --secondary-color: #6b9ac4;
-    --accent-color: #4a7ba7;
-    --bg-gradient: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
-    --highlight-color: rgba(107, 154, 196, 0.4);
-    --valid-move: rgba(107, 154, 196, 0.5);
-    --gold-gradient: linear-gradient(135deg, #6b9ac4 0%, #d4e8f7 50%, #6b9ac4 100%);
-    --luxury-shadow: 0 8px 32px rgba(107, 154, 196, 0.3);
+    --light-square: #ffffff;
+    --dark-square: #9dc4e0;
+    --secondary-color: #5a8fb8;
+    --accent-color: #3d6a94;
+    --bg-gradient: linear-gradient(135deg, #deeef9 0%, #b3d9f0 50%, #85c2e8 100%);
+    --highlight-color: rgba(90, 143, 184, 0.45);
+    --valid-move: rgba(61, 106, 148, 0.55);
+    --gold-gradient: linear-gradient(135deg, #5a8fb8 0%, #c5e3f6 50%, #5a8fb8 100%);
+    --luxury-shadow: 0 10px 35px rgba(90, 143, 184, 0.35);
+    --shadow: 0 8px 24px rgba(61, 106, 148, 0.15), 0 4px 8px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 12px 32px rgba(61, 106, 148, 0.2), 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 body {

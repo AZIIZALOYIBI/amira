@@ -181,9 +181,15 @@ class ChessUI {
                 } else {
                     document.getElementById('roomCreate').classList.remove('active');
                     document.getElementById('roomJoin').classList.add('active');
+                    // Focus first digit input when switching to join tab
+                    const firstInput = document.querySelector('.room-digit-input[data-index="0"]');
+                    if (firstInput) setTimeout(() => firstInput.focus(), 100);
                 }
             });
         });
+
+        // Room code digit inputs (OTP-style)
+        this.initRoomCodeInputs();
 
         // Mode selection
         document.querySelectorAll('.mode-option').forEach(option => {
@@ -193,6 +199,190 @@ class ChessUI {
                 this.gameMode = option.dataset.mode;
             });
         });
+    }
+
+    initRoomCodeInputs() {
+        const digitInputs = document.querySelectorAll('.room-digit-input');
+        const hiddenInput = document.getElementById('roomCodeInput');
+        const digitsOnly = (str) => str.replace(/[^0-9]/g, '');
+
+        digitInputs.forEach((input, index) => {
+            // Allow only digits
+            input.addEventListener('input', (e) => {
+                const value = digitsOnly(e.target.value);
+                e.target.value = value;
+
+                if (value.length === 1) {
+                    // Move to next input
+                    const nextInput = document.querySelector(`.room-digit-input[data-index="${index + 1}"]`);
+                    if (nextInput) {
+                        nextInput.focus();
+                    }
+                }
+
+                // Update hidden input with combined value
+                this.updateRoomCodeHiddenInput();
+
+                // Auto-validate when all 6 digits entered
+                const code = this.getRoomCodeFromInputs();
+                if (code.length === 6) {
+                    this.validateRoomCode(code);
+                } else {
+                    // Clear status when incomplete
+                    const statusEl = document.getElementById('roomStatus');
+                    statusEl.textContent = '';
+                }
+            });
+
+            // Handle backspace to move to previous input
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value) {
+                    const prevInput = document.querySelector(`.room-digit-input[data-index="${index - 1}"]`);
+                    if (prevInput) {
+                        prevInput.focus();
+                        prevInput.value = '';
+                    }
+                }
+
+                // Handle arrow keys
+                if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                    const direction = e.key === 'ArrowLeft' ? -1 : 1;
+                    const targetInput = document.querySelector(`.room-digit-input[data-index="${index + direction}"]`);
+                    if (targetInput) {
+                        e.preventDefault();
+                        targetInput.focus();
+                    }
+                }
+            });
+
+            // Handle paste - distribute pasted digits across inputs
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pastedData = digitsOnly((e.clipboardData || window.clipboardData).getData('text'));
+
+                if (pastedData.length > 0) {
+                    const digits = pastedData.slice(0, 6).split('');
+                    digitInputs.forEach((inp, i) => {
+                        inp.value = digits[i] || '';
+                    });
+                    // Focus last filled or next empty
+                    const focusIndex = Math.min(digits.length, 5);
+                    digitInputs[focusIndex].focus();
+                    this.updateRoomCodeHiddenInput();
+
+                    const code = this.getRoomCodeFromInputs();
+                    if (code.length === 6) {
+                        this.validateRoomCode(code);
+                    }
+                }
+            });
+
+            // Select content on focus
+            input.addEventListener('focus', () => {
+                input.select();
+                input.classList.add('focused');
+            });
+
+            input.addEventListener('blur', () => {
+                input.classList.remove('focused');
+            });
+        });
+    }
+
+    getRoomCodeFromInputs() {
+        const digitInputs = document.querySelectorAll('.room-digit-input');
+        let code = '';
+        digitInputs.forEach(input => {
+            code += input.value;
+        });
+        return code;
+    }
+
+    updateRoomCodeHiddenInput() {
+        const hiddenInput = document.getElementById('roomCodeInput');
+        hiddenInput.value = this.getRoomCodeFromInputs();
+    }
+
+    validateRoomCode(code) {
+        const statusEl = document.getElementById('roomStatus');
+        const room = this.roomManager.getRoom(code);
+        if (room && room.status === 'waiting' && !room.guest) {
+            statusEl.textContent = '✓ غرفة متاحة - جاهز للانضمام';
+            statusEl.style.color = '#4CAF50';
+            statusEl.classList.add('room-status-success');
+            statusEl.classList.remove('room-status-error');
+        } else if (room && room.status !== 'waiting') {
+            statusEl.textContent = '✗ هذه الغرفة مشغولة أو انتهت';
+            statusEl.style.color = '#f44336';
+            statusEl.classList.add('room-status-error');
+            statusEl.classList.remove('room-status-success');
+        } else if (room && room.guest) {
+            statusEl.textContent = '✗ الغرفة ممتلئة';
+            statusEl.style.color = '#f44336';
+            statusEl.classList.add('room-status-error');
+            statusEl.classList.remove('room-status-success');
+        } else {
+            statusEl.textContent = '✗ كود الدخول غير صحيح';
+            statusEl.style.color = '#f44336';
+            statusEl.classList.add('room-status-error');
+            statusEl.classList.remove('room-status-success');
+        }
+    }
+
+    copyRoomCode(code) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(code).then(() => {
+                this.showCopyFeedback();
+            }).catch(() => {
+                this.fallbackCopyRoomCode(code);
+            });
+        } else {
+            this.fallbackCopyRoomCode(code);
+        }
+    }
+
+    fallbackCopyRoomCode(code) {
+        const textArea = document.createElement('textarea');
+        textArea.value = code;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            this.showCopyFeedback();
+        } catch (err) {
+            this.showCopyError();
+        }
+        document.body.removeChild(textArea);
+    }
+
+    showCopyFeedback() {
+        const btn = document.querySelector('.copy-code-btn');
+        if (btn) {
+            const originalText = btn.textContent;
+            btn.textContent = '✓ تم النسخ!';
+            btn.setAttribute('aria-label', 'تم نسخ كود الغرفة بنجاح');
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.setAttribute('aria-label', 'نسخ كود الغرفة');
+                btn.classList.remove('copied');
+            }, 2000);
+        }
+    }
+
+    showCopyError() {
+        const btn = document.querySelector('.copy-code-btn');
+        if (btn) {
+            const originalText = btn.textContent;
+            btn.textContent = '✗ تعذر النسخ';
+            btn.setAttribute('aria-label', 'تعذر نسخ كود الغرفة');
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.setAttribute('aria-label', 'نسخ كود الغرفة');
+            }, 2000);
+        }
     }
 
     startGame() {
@@ -226,12 +416,23 @@ class ChessUI {
                 const result = this.roomManager.createRoom(user.username, user.displayName, this.gameMode);
                 if (result.success) {
                     const roomCodeDisplay = document.getElementById('roomCodeDisplay');
+                    const codeDigits = result.roomCode.split('').map(d => `<span class="code-digit">${d}</span>`).join('');
                     roomCodeDisplay.innerHTML = `
-                        <h3>كود الغرفة:</h3>
-                        <div class="room-code-large">${result.roomCode}</div>
+                        <h3>🔑 كود الغرفة:</h3>
+                        <div class="room-code-large">${codeDigits}</div>
+                        <button class="copy-code-btn" aria-label="نسخ كود الغرفة">📋 نسخ الكود</button>
                         <p class="room-info">شارك هذا الكود مع الشخص الآخر للانضمام</p>
-                        <p class="waiting-text">في انتظار اللاعب الآخر...</p>
+                        <div class="waiting-indicator">
+                            <div class="waiting-spinner"></div>
+                            <p class="waiting-text">في انتظار اللاعب الآخر...</p>
+                        </div>
                     `;
+
+                    // Attach copy event listener programmatically
+                    const copyBtn = roomCodeDisplay.querySelector('.copy-code-btn');
+                    if (copyBtn) {
+                        copyBtn.addEventListener('click', () => this.copyRoomCode(result.roomCode));
+                    }
 
                     // Set player names
                     this.playerNames.white = user.displayName;
@@ -1233,4 +1434,5 @@ class ChessUI {
 // Initialize the game when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     const ui = new ChessUI();
+    window.chessUI = ui;
 });

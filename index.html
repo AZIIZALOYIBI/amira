@@ -154,9 +154,18 @@
                     </div>
 
                     <div class="room-join" id="roomJoin">
-                        <label for="roomCodeInput">كود الدخول:</label>
-                        <input type="text" id="roomCodeInput" class="player-name-input"
-                               placeholder="أدخل كود الدخول (6 أرقام)" maxlength="6">
+                        <label class="room-code-label">كود الدخول:</label>
+                        <div class="room-code-inputs" id="roomCodeInputs">
+                            <input type="text" inputmode="numeric" class="room-digit-input" maxlength="1" data-index="0" autocomplete="off">
+                            <input type="text" inputmode="numeric" class="room-digit-input" maxlength="1" data-index="1" autocomplete="off">
+                            <input type="text" inputmode="numeric" class="room-digit-input" maxlength="1" data-index="2" autocomplete="off">
+                            <span class="room-code-separator">-</span>
+                            <input type="text" inputmode="numeric" class="room-digit-input" maxlength="1" data-index="3" autocomplete="off">
+                            <input type="text" inputmode="numeric" class="room-digit-input" maxlength="1" data-index="4" autocomplete="off">
+                            <input type="text" inputmode="numeric" class="room-digit-input" maxlength="1" data-index="5" autocomplete="off">
+                        </div>
+                        <!-- Hidden input to maintain backward compatibility -->
+                        <input type="hidden" id="roomCodeInput">
                         <p class="room-status" id="roomStatus"></p>
                     </div>
                 </div>

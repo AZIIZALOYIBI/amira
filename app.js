@@ -146,8 +146,12 @@ class ChessUI {
         // Control buttons
         document.getElementById('newGameBtn').addEventListener('click', () => this.newGame());
         document.getElementById('undoBtn').addEventListener('click', () => this.undoMove());
+        document.getElementById('redoBtn').addEventListener('click', () => this.redoMove());
         document.getElementById('resetBtn').addEventListener('click', () => this.resetGame());
         document.getElementById('flipBoardBtn').addEventListener('click', () => this.flipBoard());
+        document.getElementById('saveBtn').addEventListener('click', () => this.saveGame());
+        document.getElementById('loadBtn').addEventListener('click', () => this.loadGame());
+        document.getElementById('exportBtn').addEventListener('click', () => this.exportPGN());
 
         // Settings
         document.getElementById('soundToggle').addEventListener('change', (e) => {
@@ -567,10 +571,73 @@ class ChessUI {
     }
 
     undoMove() {
-        if (this.game.moveHistory.length === 0) return;
+        if (this.game.undo()) {
+            this.playSound('move');
+            this.renderBoard();
+            this.updateGameStatus();
+            this.deselectSquare();
+        }
+    }
 
-        // This is a simplified undo - a full implementation would need to restore all game state
-        alert('ميزة التراجع قيد التطوير');
+    redoMove() {
+        if (this.game.redo()) {
+            this.playSound('move');
+            this.renderBoard();
+            this.updateGameStatus();
+            this.deselectSquare();
+        }
+    }
+
+    saveGame() {
+        const slot = prompt('اسم حفظ اللعبة:', 'game_' + Date.now());
+        if (slot) {
+            if (this.game.saveToLocalStorage(slot)) {
+                alert('✅ تم حفظ اللعبة بنجاح!');
+            } else {
+                alert('❌ فشل حفظ اللعبة');
+            }
+        }
+    }
+
+    loadGame() {
+        const games = ChessGame.getSavedGames();
+        if (games.length === 0) {
+            alert('لا توجد ألعاب محفوظة');
+            return;
+        }
+
+        let message = 'اختر لعبة للتحميل:\n\n';
+        games.forEach((game, index) => {
+            message += `${index + 1}. ${game.slot} - ${game.moves} حركة\n`;
+        });
+
+        const choice = prompt(message + '\nأدخل رقم اللعبة:');
+        if (choice) {
+            const index = parseInt(choice) - 1;
+            if (index >= 0 && index < games.length) {
+                if (this.game.loadFromLocalStorage(games[index].slot)) {
+                    this.renderBoard();
+                    this.updateGameStatus();
+                    alert('✅ تم تحميل اللعبة بنجاح!');
+                } else {
+                    alert('❌ فشل تحميل اللعبة');
+                }
+            }
+        }
+    }
+
+    exportPGN() {
+        const pgn = this.game.toPGN(this.playerNames.white, this.playerNames.black);
+        const blob = new Blob([pgn], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `amira_chess_${Date.now()}.pgn`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        alert('✅ تم تصدير اللعبة بصيغة PGN!');
     }
 }
 

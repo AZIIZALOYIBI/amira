@@ -14,6 +14,8 @@ class ChessGame {
         this.lastMove = null;
         this.capturedPieces = { white: [], black: [] };
         this.moveHistory = [];
+        this.gameStateHistory = []; // Full state history for undo/redo
+        this.redoStack = []; // Stack for redo functionality
         this.enPassantTarget = null;
         this.castlingRights = {
             white: { kingside: true, queenside: true },
@@ -21,6 +23,7 @@ class ChessGame {
         };
 
         this.initBoard();
+        this.saveState(); // Save initial state
     }
 
     initBoard() {
@@ -298,6 +301,7 @@ class ChessGame {
         }
 
         this.switchPlayer();
+        this.saveState(); // Save state after move
         return { success: true };
     }
 
@@ -459,5 +463,181 @@ class ChessGame {
 
     reset() {
         this.initBoard();
+        this.gameStateHistory = [];
+        this.redoStack = [];
+        this.saveState();
+    }
+
+    // Save current game state for undo functionality
+    saveState() {
+        const state = {
+            board: JSON.parse(JSON.stringify(this.board)),
+            currentPlayer: this.currentPlayer,
+            gameOver: this.gameOver,
+            checkState: this.checkState,
+            lastMove: this.lastMove ? JSON.parse(JSON.stringify(this.lastMove)) : null,
+            capturedPieces: JSON.parse(JSON.stringify(this.capturedPieces)),
+            moveHistory: JSON.parse(JSON.stringify(this.moveHistory)),
+            enPassantTarget: this.enPassantTarget ? JSON.parse(JSON.stringify(this.enPassantTarget)) : null,
+            castlingRights: JSON.parse(JSON.stringify(this.castlingRights))
+        };
+        this.gameStateHistory.push(state);
+        // Clear redo stack when a new move is made
+        this.redoStack = [];
+    }
+
+    // Restore a game state
+    restoreState(state) {
+        this.board = JSON.parse(JSON.stringify(state.board));
+        this.currentPlayer = state.currentPlayer;
+        this.gameOver = state.gameOver;
+        this.checkState = state.checkState;
+        this.lastMove = state.lastMove ? JSON.parse(JSON.stringify(state.lastMove)) : null;
+        this.capturedPieces = JSON.parse(JSON.stringify(state.capturedPieces));
+        this.moveHistory = JSON.parse(JSON.stringify(state.moveHistory));
+        this.enPassantTarget = state.enPassantTarget ? JSON.parse(JSON.stringify(state.enPassantTarget)) : null;
+        this.castlingRights = JSON.parse(JSON.stringify(state.castlingRights));
+    }
+
+    // Undo last move
+    undo() {
+        if (this.gameStateHistory.length <= 1) return false; // Can't undo initial state
+
+        // Save current state to redo stack
+        const currentState = this.gameStateHistory.pop();
+        this.redoStack.push(currentState);
+
+        // Restore previous state
+        const previousState = this.gameStateHistory[this.gameStateHistory.length - 1];
+        this.restoreState(previousState);
+
+        return true;
+    }
+
+    // Redo previously undone move
+    redo() {
+        if (this.redoStack.length === 0) return false;
+
+        const state = this.redoStack.pop();
+        this.gameStateHistory.push(state);
+        this.restoreState(state);
+
+        return true;
+    }
+
+    // Export game to PGN format
+    toPGN(whitePlayer = 'اللاعب الأبيض', blackPlayer = 'اللاعب الأسود') {
+        let pgn = `[Event "لعبة شطرنج"]\n`;
+        pgn += `[Site "Amira Chess"]\n`;
+        pgn += `[Date "${new Date().toISOString().split('T')[0]}"]\n`;
+        pgn += `[White "${whitePlayer}"]\n`;
+        pgn += `[Black "${blackPlayer}"]\n`;
+        pgn += `[Result "*"]\n\n`;
+
+        // Add moves
+        for (let i = 0; i < this.moveHistory.length; i++) {
+            if (i % 2 === 0) {
+                pgn += `${Math.floor(i / 2) + 1}. `;
+            }
+            pgn += this.formatMoveForPGN(this.moveHistory[i]) + ' ';
+            if (i % 2 === 1) {
+                pgn += '\n';
+            }
+        }
+
+        return pgn;
+    }
+
+    formatMoveForPGN(move) {
+        const files = 'abcdefgh';
+        const from = files[move.from.col] + (8 - move.from.row);
+        const to = files[move.to.col] + (8 - move.to.row);
+
+        if (move.castling) {
+            return move.castling === 'king' ? 'O-O' : 'O-O-O';
+        }
+
+        let notation = '';
+        const pieceSymbols = { pawn: '', rook: 'R', knight: 'N', bishop: 'B', queen: 'Q', king: 'K' };
+        notation = pieceSymbols[move.piece];
+        if (move.captured) notation += 'x';
+        notation += to;
+        if (move.promotion) {
+            notation += '=' + pieceSymbols[move.promotion].toUpperCase();
+        }
+
+        return notation;
+    }
+
+    // Save game to localStorage
+    saveToLocalStorage(slot = 'autosave') {
+        const gameData = {
+            board: this.board,
+            currentPlayer: this.currentPlayer,
+            moveHistory: this.moveHistory,
+            capturedPieces: this.capturedPieces,
+            enPassantTarget: this.enPassantTarget,
+            castlingRights: this.castlingRights,
+            gameOver: this.gameOver,
+            checkState: this.checkState,
+            timestamp: new Date().toISOString()
+        };
+
+        try {
+            localStorage.setItem(`amira_chess_${slot}`, JSON.stringify(gameData));
+            return true;
+        } catch (e) {
+            console.error('Failed to save game:', e);
+            return false;
+        }
+    }
+
+    // Load game from localStorage
+    loadFromLocalStorage(slot = 'autosave') {
+        try {
+            const data = localStorage.getItem(`amira_chess_${slot}`);
+            if (!data) return false;
+
+            const gameData = JSON.parse(data);
+            this.board = gameData.board;
+            this.currentPlayer = gameData.currentPlayer;
+            this.moveHistory = gameData.moveHistory;
+            this.capturedPieces = gameData.capturedPieces;
+            this.enPassantTarget = gameData.enPassantTarget;
+            this.castlingRights = gameData.castlingRights;
+            this.gameOver = gameData.gameOver;
+            this.checkState = gameData.checkState;
+
+            // Rebuild state history
+            this.gameStateHistory = [];
+            this.redoStack = [];
+            this.saveState();
+
+            return true;
+        } catch (e) {
+            console.error('Failed to load game:', e);
+            return false;
+        }
+    }
+
+    // Get list of saved games
+    static getSavedGames() {
+        const games = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('amira_chess_')) {
+                try {
+                    const data = JSON.parse(localStorage.getItem(key));
+                    games.push({
+                        slot: key.replace('amira_chess_', ''),
+                        timestamp: data.timestamp,
+                        moves: data.moveHistory.length
+                    });
+                } catch (e) {
+                    console.error('Error reading saved game:', e);
+                }
+            }
+        }
+        return games;
     }
 }

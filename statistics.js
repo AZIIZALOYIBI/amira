@@ -35,11 +35,21 @@ class ChessStatistics {
                 pawn: 0, knight: 0, bishop: 0, rook: 0, queen: 0
             },
             openings: {},
-            lastPlayed: null
+            lastPlayed: null,
+            currentWinStreak: 0,
+            bestWinStreak: 0,
+            puzzlesSolved: 0,
+            perfectGames: 0,
+            aiWinsEasy: 0,
+            aiWinsMedium: 0,
+            aiWinsHard: 0,
+            comebackWins: 0,
+            totalPlayTime: 0, // in seconds
+            gameHistory: [] // Last 50 games
         };
     }
 
-    recordGame(result, moves, playerColor, reason = 'checkmate') {
+    recordGame(result, moves, playerColor, reason = 'checkmate', extraData = {}) {
         this.stats.gamesPlayed++;
         this.stats.totalMoves += moves;
         this.stats.lastPlayed = new Date().toISOString();
@@ -53,17 +63,65 @@ class ChessStatistics {
         }
         this.stats.averageGameLength = Math.floor(this.stats.totalMoves / this.stats.gamesPlayed);
 
-        // Update result stats
+        // Update result stats and win streak
         if (result === 'win') {
             this.stats.wins[playerColor]++;
+            this.stats.currentWinStreak++;
+
+            if (this.stats.currentWinStreak > this.stats.bestWinStreak) {
+                this.stats.bestWinStreak = this.stats.currentWinStreak;
+            }
+
             if (reason === 'checkmate') this.stats.checkmates++;
             else if (reason === 'timeout') this.stats.timeouts++;
             else if (reason === 'resignation') this.stats.resignations++;
-        } else if (result === 'loss') {
-            this.stats.losses[playerColor]++;
-        } else if (result === 'draw') {
-            this.stats.draws++;
-            if (reason === 'stalemate') this.stats.stalemates++;
+
+            // Track AI wins by difficulty
+            if (extraData.vsAI && extraData.aiDifficulty) {
+                if (extraData.aiDifficulty === 'easy') this.stats.aiWinsEasy++;
+                else if (extraData.aiDifficulty === 'medium') this.stats.aiWinsMedium++;
+                else if (extraData.aiDifficulty === 'hard') this.stats.aiWinsHard++;
+            }
+
+            // Track perfect games (no pieces lost)
+            if (extraData.piecesLost === 0) {
+                this.stats.perfectGames++;
+            }
+
+            // Track comeback wins
+            if (extraData.comebackWin) {
+                this.stats.comebackWins++;
+            }
+        } else {
+            this.stats.currentWinStreak = 0;
+
+            if (result === 'loss') {
+                this.stats.losses[playerColor]++;
+            } else if (result === 'draw') {
+                this.stats.draws++;
+                if (reason === 'stalemate') this.stats.stalemates++;
+            }
+        }
+
+        // Add play time
+        if (extraData.playTime) {
+            this.stats.totalPlayTime += extraData.playTime;
+        }
+
+        // Add to game history (keep last 50 games)
+        this.stats.gameHistory = this.stats.gameHistory || [];
+        this.stats.gameHistory.push({
+            date: new Date().toISOString(),
+            result,
+            moves,
+            playerColor,
+            reason,
+            vsAI: extraData.vsAI || false,
+            aiDifficulty: extraData.aiDifficulty || null
+        });
+
+        if (this.stats.gameHistory.length > 50) {
+            this.stats.gameHistory.shift();
         }
 
         this.saveStats();
@@ -127,21 +185,39 @@ class ChessStatistics {
 إحصائيات لعبة الشطرنج - Amira Chess
 =====================================
 
+📊 الإحصائيات العامة:
 عدد الألعاب: ${stats.gamesPlayed}
 الفوز بالأبيض: ${stats.wins.white} (${stats.whiteWinRate}%)
 الفوز بالأسود: ${stats.wins.black} (${stats.blackWinRate}%)
 التعادل: ${stats.draws}
 معدل الفوز الإجمالي: ${stats.winRate}%
 
+🔥 السلاسل:
+سلسلة الفوز الحالية: ${stats.currentWinStreak}
+أفضل سلسلة فوز: ${stats.bestWinStreak}
+
+⏱️ إحصائيات اللعب:
 متوسط طول اللعبة: ${stats.averageGameLength} حركة
 أطول لعبة: ${stats.longestGame} حركة
-أقصر لعبة: ${stats.shortestGame === Infinity ? 'N/A' : stats.shortestGame + ' حركة'}
+أقصر لعبة: ${stats.shortestGame === Infinity ? 'لا يوجد' : stats.shortestGame + ' حركة'}
+إجمالي وقت اللعب: ${this.formatPlayTime(stats.totalPlayTime)}
 
+🎯 طرق الفوز:
 الكش مات: ${stats.checkmates}
 الجمود: ${stats.stalemates}
 انتهاء الوقت: ${stats.timeouts}
 
-القطع المأسورة:
+🤖 ضد الذكاء الاصطناعي:
+انتصارات - سهل: ${stats.aiWinsEasy}
+انتصارات - متوسط: ${stats.aiWinsMedium}
+انتصارات - صعب: ${stats.aiWinsHard}
+
+💎 إنجازات خاصة:
+ألعاب مثالية (بدون خسائر): ${stats.perfectGames}
+انتصارات عودة: ${stats.comebackWins}
+ألغاز محلولة: ${stats.puzzlesSolved}
+
+♟️ القطع المأسورة:
 - بيادق: ${stats.piecesCaptured.pawn}
 - أحصنة: ${stats.piecesCaptured.knight}
 - فيلة: ${stats.piecesCaptured.bishop}
@@ -152,6 +228,63 @@ class ChessStatistics {
         `.trim();
 
         return text;
+    }
+
+    formatPlayTime(seconds) {
+        if (!seconds) return '0 دقيقة';
+
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+
+        if (hours > 0) {
+            return `${hours} ساعة ${minutes} دقيقة`;
+        }
+        return `${minutes} دقيقة`;
+    }
+
+    getRecentPerformance(games = 10) {
+        const history = this.stats.gameHistory || [];
+        const recent = history.slice(-games);
+
+        if (recent.length === 0) {
+            return { wins: 0, losses: 0, draws: 0, winRate: 0 };
+        }
+
+        const wins = recent.filter(g => g.result === 'win').length;
+        const losses = recent.filter(g => g.result === 'loss').length;
+        const draws = recent.filter(g => g.result === 'draw').length;
+
+        return {
+            wins,
+            losses,
+            draws,
+            winRate: recent.length > 0 ? Math.round((wins / recent.length) * 100) : 0
+        };
+    }
+
+    getPerformanceByColor() {
+        const whiteGames = this.stats.wins.white + this.stats.losses.white;
+        const blackGames = this.stats.wins.black + this.stats.losses.black;
+
+        return {
+            white: {
+                games: whiteGames,
+                wins: this.stats.wins.white,
+                losses: this.stats.losses.white,
+                winRate: this.getWinRate('white')
+            },
+            black: {
+                games: blackGames,
+                wins: this.stats.wins.black,
+                losses: this.stats.losses.black,
+                winRate: this.getWinRate('black')
+            }
+        };
+    }
+
+    recordPuzzleSolved() {
+        this.stats.puzzlesSolved = (this.stats.puzzlesSolved || 0) + 1;
+        this.saveStats();
     }
 }
 

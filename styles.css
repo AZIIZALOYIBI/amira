@@ -1711,22 +1711,13 @@ header .subtitle {
         0 4px 16px rgba(102, 126, 234, 0.4);
 }
 
-/* Valid move dots in 3D */
-.board-3d .square.valid-move::after,
-.board-3d .square.valid-capture::after {
-    /* Override side face, use only for indicator */
-    right: auto;
-    width: auto;
-    height: auto;
-    transform: translateZ(8px);
-    transform-origin: center;
-}
-
+/* Valid move indicators in 3D - override right side face (::after) with indicator */
 .board-3d .square.valid-move::after {
     content: '';
     position: absolute;
     top: 50%;
     left: 50%;
+    right: auto;
     width: 24px;
     height: 24px;
     margin-top: -12px;
@@ -1735,6 +1726,8 @@ header .subtitle {
     border-radius: 50%;
     pointer-events: none;
     box-shadow: 0 2px 8px rgba(107, 154, 196, 0.4);
+    transform: translateZ(8px);
+    transform-origin: center;
 }
 
 .board-3d .square.valid-capture::after {
@@ -1742,11 +1735,14 @@ header .subtitle {
     position: absolute;
     top: 0;
     left: 0;
+    right: auto;
     width: 100%;
     height: 100%;
     border: 4px solid var(--valid-move);
     border-radius: 4px;
     pointer-events: none;
+    transform: translateZ(8px);
+    transform-origin: center;
 }
 
 /* Last move highlight in 3D */
@@ -1792,10 +1788,6 @@ header .subtitle {
         right: -5px;
     }
     .board-3d .piece {
-        transform: translateZ(6px) scale(1);
-        filter: drop-shadow(1px 4px 3px rgba(0, 0, 0, 0.4));
-    }
-    .board-3d .piece:hover {
         transform: translateZ(6px) scale(1);
         filter: drop-shadow(1px 4px 3px rgba(0, 0, 0, 0.4));
     }

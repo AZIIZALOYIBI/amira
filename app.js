@@ -561,12 +561,10 @@ class ChessUI {
         this.gameResultRecorded = false;
         this.gameStartedAt = Date.now();
 
-        // Load saved theme
-        const savedTheme = localStorage.getItem('chess_theme');
-        if (savedTheme) {
-            document.getElementById('themeSelector').value = savedTheme;
-            this.changeTheme(savedTheme);
-        }
+        // Load saved theme (default to Claude orange design)
+        const savedTheme = localStorage.getItem('chess_theme') || 'claude-orange';
+        document.getElementById('themeSelector').value = savedTheme;
+        this.changeTheme(savedTheme);
 
         // Load saved 3D mode
         const saved3D = localStorage.getItem('chess_3d_mode');

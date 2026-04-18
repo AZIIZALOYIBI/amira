@@ -1617,6 +1617,212 @@ header .subtitle {
     right: 3px;
 }
 
+/* ==============================
+   3D Board Mode
+   ============================== */
+
+.board-3d .board-wrapper {
+    perspective: 900px;
+    perspective-origin: 50% 100%;
+}
+
+.board-3d .chess-board {
+    transform: rotateX(45deg) rotateZ(0deg);
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: visible;
+    border-radius: 4px;
+    box-shadow:
+        0 60px 80px rgba(0, 0, 0, 0.35),
+        0 30px 40px rgba(0, 0, 0, 0.2);
+}
+
+.board-3d .square {
+    transform-style: preserve-3d;
+    position: relative;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Board thickness / side faces */
+.board-3d .square::before {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    transform: rotateX(-90deg);
+    transform-origin: top;
+}
+
+.board-3d .square.light::before {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--light-square) 80%, #000) 0%,
+        color-mix(in srgb, var(--light-square) 60%, #000) 100%);
+}
+
+.board-3d .square.dark::before {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--dark-square) 80%, #000) 0%,
+        color-mix(in srgb, var(--dark-square) 60%, #000) 100%);
+}
+
+/* Right side face */
+.board-3d .square::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -8px;
+    width: 8px;
+    height: 100%;
+    transform: rotateY(90deg);
+    transform-origin: left;
+}
+
+.board-3d .square.light::after {
+    background: linear-gradient(90deg,
+        color-mix(in srgb, var(--light-square) 70%, #000) 0%,
+        color-mix(in srgb, var(--light-square) 50%, #000) 100%);
+}
+
+.board-3d .square.dark::after {
+    background: linear-gradient(90deg,
+        color-mix(in srgb, var(--dark-square) 70%, #000) 0%,
+        color-mix(in srgb, var(--dark-square) 50%, #000) 100%);
+}
+
+/* 3D Pieces - elevated with shadows */
+.board-3d .piece {
+    transform: translateZ(10px) scale(1);
+    filter: drop-shadow(2px 6px 4px rgba(0, 0, 0, 0.45));
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.board-3d .piece:hover {
+    transform: translateZ(20px) scale(1.15);
+    filter: drop-shadow(4px 12px 8px rgba(0, 0, 0, 0.5)) brightness(1.1);
+}
+
+/* Selected square lifts up in 3D */
+.board-3d .square.selected {
+    transform: translateZ(6px);
+    box-shadow:
+        inset 0 0 20px rgba(102, 126, 234, 0.6),
+        0 4px 16px rgba(102, 126, 234, 0.4);
+}
+
+/* Valid move indicators in 3D - override right side face (::after) with indicator */
+.board-3d .square.valid-move::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    width: 24px;
+    height: 24px;
+    margin-top: -12px;
+    margin-left: -12px;
+    background: var(--valid-move);
+    border-radius: 50%;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(107, 154, 196, 0.4);
+    transform: translateZ(8px);
+    transform-origin: center;
+}
+
+.board-3d .square.valid-capture::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: auto;
+    width: 100%;
+    height: 100%;
+    border: 4px solid var(--valid-move);
+    border-radius: 4px;
+    pointer-events: none;
+    transform: translateZ(8px);
+    transform-origin: center;
+}
+
+/* Last move highlight in 3D */
+.board-3d .square.last-move {
+    transform: translateZ(3px);
+}
+
+/* Check highlight in 3D */
+.board-3d .square.in-check {
+    transform: translateZ(4px);
+    box-shadow: 0 4px 20px rgba(220, 53, 69, 0.6);
+}
+
+/* Board shadow on surface */
+.board-3d .chess-board-container {
+    padding-bottom: 60px;
+}
+
+/* 3D mode responsive - tablet */
+@media (max-width: 1200px) {
+    .board-3d .board-wrapper {
+        perspective: 750px;
+    }
+    .board-3d .chess-board {
+        transform: rotateX(40deg);
+    }
+}
+
+/* 3D mode responsive - mobile */
+@media (max-width: 768px) {
+    .board-3d .board-wrapper {
+        perspective: 550px;
+    }
+    .board-3d .chess-board {
+        transform: rotateX(35deg);
+    }
+    .board-3d .square::before {
+        height: 5px;
+        bottom: -5px;
+    }
+    .board-3d .square::after {
+        width: 5px;
+        right: -5px;
+    }
+    .board-3d .piece {
+        transform: translateZ(6px) scale(1);
+        filter: drop-shadow(1px 4px 3px rgba(0, 0, 0, 0.4));
+    }
+    .board-3d .chess-board-container {
+        padding-bottom: 40px;
+    }
+}
+
+/* 3D mode responsive - small mobile */
+@media (max-width: 480px) {
+    .board-3d .board-wrapper {
+        perspective: 400px;
+    }
+    .board-3d .chess-board {
+        transform: rotateX(30deg);
+    }
+    .board-3d .square::before {
+        height: 4px;
+        bottom: -4px;
+    }
+    .board-3d .square::after {
+        width: 4px;
+        right: -4px;
+    }
+}
+
+/* Smooth transition when toggling 3D */
+.board-wrapper {
+    transition: perspective 0.5s ease;
+}
+
+.chess-board {
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .move-history h3 {
     color: var(--primary-color);
     margin-bottom: 18px;

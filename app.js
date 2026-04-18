@@ -568,6 +568,13 @@ class ChessUI {
             this.changeTheme(savedTheme);
         }
 
+        // Load saved 3D mode
+        const saved3D = localStorage.getItem('chess_3d_mode');
+        if (saved3D === 'true') {
+            document.getElementById('threeDToggle').checked = true;
+            this.toggle3DMode(true);
+        }
+
         this.renderBoard();
         this.attachEventListeners();
         this.updateGameStatus();
@@ -707,6 +714,9 @@ class ChessUI {
                 this.stopTimer();
             }
         });
+        document.getElementById('threeDToggle').addEventListener('change', (e) => {
+            this.toggle3DMode(e.target.checked);
+        });
         document.getElementById('themeSelector').addEventListener('change', (e) => {
             this.changeTheme(e.target.value);
         });
@@ -816,6 +826,16 @@ class ChessUI {
         }
         localStorage.setItem('chess_theme', theme);
         this.renderBoard(); // Re-render to apply new colors
+    }
+
+    toggle3DMode(enabled) {
+        const container = document.querySelector('.chess-board-container');
+        if (enabled) {
+            container.classList.add('board-3d');
+        } else {
+            container.classList.remove('board-3d');
+        }
+        localStorage.setItem('chess_3d_mode', enabled ? 'true' : 'false');
     }
 
     handleSquareClick(e) {

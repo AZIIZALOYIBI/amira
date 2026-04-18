@@ -231,6 +231,7 @@ class ChessGame {
 
         const move = this.validMoves.find(m => m.row === toRow && m.col === toCol);
         if (!move) return { success: false };
+        const opponentColor = this.currentPlayer === 'white' ? 'black' : 'white';
 
         // Handle en passant capture
         if (move.type === 'enpassant') {
@@ -257,6 +258,14 @@ class ChessGame {
         const capturedPiece = this.getPiece(toRow, toCol);
         if (capturedPiece && move.type === 'capture') {
             this.capturedPieces[this.currentPlayer].push(capturedPiece);
+
+            // Disable castling if captured piece is a rook on its original square.
+            if (capturedPiece.type === 'rook') {
+                if (toRow === 0 && toCol === 0) this.castlingRights.black.queenside = false;
+                if (toRow === 0 && toCol === 7) this.castlingRights.black.kingside = false;
+                if (toRow === 7 && toCol === 0) this.castlingRights.white.queenside = false;
+                if (toRow === 7 && toCol === 7) this.castlingRights.white.kingside = false;
+            }
         }
 
         // Move the piece
@@ -290,17 +299,22 @@ class ChessGame {
             to: { row: toRow, col: toCol },
             piece: piece.type,
             color: piece.color,
-            captured: capturedPiece
+            captured: capturedPiece ? capturedPiece.type : null,
+            castling: move.type === 'castle-kingside' ? 'king' : (move.type === 'castle-queenside' ? 'queen' : null),
+            enPassant: move.type === 'enpassant'
         };
 
         this.moveHistory.push(this.lastMove);
 
         // Check for pawn promotion
         if (piece.type === 'pawn' && (toRow === 0 || toRow === 7)) {
+            this.lastMove.promotion = 'queen';
+            this.lastMove.check = this.isInCheck(opponentColor);
             return { success: true, promotion: true, row: toRow, col: toCol };
         }
 
         this.switchPlayer();
+        this.lastMove.check = this.isInCheck(this.currentPlayer);
         this.saveState(); // Save state after move
         return { success: true };
     }
@@ -309,6 +323,9 @@ class ChessGame {
         const piece = this.getPiece(row, col);
         if (piece && piece.type === 'pawn') {
             this.board[row][col] = { type: newType, color: piece.color };
+            if (this.lastMove) {
+                this.lastMove.promotion = newType;
+            }
         }
     }
 

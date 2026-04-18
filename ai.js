@@ -111,104 +111,169 @@ class ChessAI {
     getBestMove(game, color) {
         this.positionCount = 0;
         const startTime = Date.now();
+        const savedState = this.saveGameState(game);
+        game.currentPlayer = color;
 
-        let bestMove = null;
-        let bestValue = -Infinity;
-        const alpha = -Infinity;
-        const beta = Infinity;
-
-        // Get all possible moves
-        const allMoves = this.getAllPossibleMoves(game, color);
-
+        let allMoves = this.getAllPossibleMoves(game, color);
+        allMoves = this.orderMoves(game, allMoves);
         if (allMoves.length === 0) {
+            this.restoreGameState(game, savedState);
             return null;
         }
 
-        // Easy mode: sometimes make random moves
-        if (this.difficulty === 'easy' && Math.random() < 0.3) {
-            return allMoves[Math.floor(Math.random() * allMoves.length)];
+        // Easy mode: sometimes choose a legal but non-optimal move.
+        if (this.difficulty === 'easy' && Math.random() < 0.25) {
+            const randomMove = allMoves[Math.floor(Math.random() * allMoves.length)];
+            this.restoreGameState(game, savedState);
+            return randomMove;
         }
 
-        // Evaluate each move
-        for (const move of allMoves) {
-            const moveValue = this.evaluateMove(game, move, color, 0, alpha, beta);
+        let bestMove = allMoves[0];
+        let bestValue = -Infinity;
+        let alpha = -Infinity;
+        const beta = Infinity;
 
-            if (moveValue > bestValue) {
-                bestValue = moveValue;
+        for (const move of allMoves) {
+            const stateBeforeMove = this.saveGameState(game);
+            this.applyMove(game, move);
+            const score = this.minimax(
+                game,
+                this.maxDepth - 1,
+                alpha,
+                beta,
+                false,
+                color
+            );
+            this.restoreGameState(game, stateBeforeMove);
+
+            if (score > bestValue) {
+                bestValue = score;
                 bestMove = move;
             }
+            alpha = Math.max(alpha, bestValue);
         }
 
         const endTime = Date.now();
         console.log(`AI evaluated ${this.positionCount} positions in ${endTime - startTime}ms`);
         console.log(`Best move value: ${bestValue}`);
+        this.restoreGameState(game, savedState);
 
         return bestMove;
     }
 
-    /**
-     * Evaluate a move using minimax with alpha-beta pruning
-     */
-    evaluateMove(game, move, color, depth, alpha, beta) {
-        // Save game state
-        const savedState = this.saveGameState(game);
+    minimax(game, depth, alpha, beta, maximizingPlayer, aiColor) {
+        this.positionCount++;
+        const currentColor = maximizingPlayer ? aiColor : this.getOpponentColor(aiColor);
+        game.currentPlayer = currentColor;
 
-        // Make the move
+        if (depth === 0 || this.isTerminal(game, currentColor)) {
+            return this.evaluatePosition(game, aiColor);
+        }
+
+        let moves = this.getAllPossibleMoves(game, currentColor);
+        moves = this.orderMoves(game, moves);
+
+        if (moves.length === 0) {
+            return this.evaluatePosition(game, aiColor);
+        }
+
+        if (maximizingPlayer) {
+            let maxEval = -Infinity;
+            for (const move of moves) {
+                const savedState = this.saveGameState(game);
+                this.applyMove(game, move);
+                const evalScore = this.minimax(game, depth - 1, alpha, beta, false, aiColor);
+                this.restoreGameState(game, savedState);
+
+                maxEval = Math.max(maxEval, evalScore);
+                alpha = Math.max(alpha, evalScore);
+                if (beta <= alpha) break;
+            }
+            return maxEval;
+        }
+
+        let minEval = Infinity;
+        for (const move of moves) {
+            const savedState = this.saveGameState(game);
+            this.applyMove(game, move);
+            const evalScore = this.minimax(game, depth - 1, alpha, beta, true, aiColor);
+            this.restoreGameState(game, savedState);
+
+            minEval = Math.min(minEval, evalScore);
+            beta = Math.min(beta, evalScore);
+            if (beta <= alpha) break;
+        }
+        return minEval;
+    }
+
+    applyMove(game, move) {
         const piece = game.getPiece(move.fromRow, move.fromCol);
-        const capturedPiece = game.getPiece(move.toRow, move.toCol);
+        if (!piece) return;
+
+        // Handle en passant in search tree.
+        if (piece.type === 'pawn' && game.enPassantTarget &&
+            move.toRow === game.enPassantTarget.row &&
+            move.toCol === game.enPassantTarget.col &&
+            !game.getPiece(move.toRow, move.toCol)) {
+            game.board[move.fromRow][move.toCol] = null;
+        }
+
+        // Handle castling in search tree.
+        if (piece.type === 'king' && Math.abs(move.toCol - move.fromCol) === 2) {
+            const backRank = piece.color === 'white' ? 7 : 0;
+            if (move.toCol === 6) {
+                game.board[backRank][5] = game.board[backRank][7];
+                game.board[backRank][7] = null;
+            } else if (move.toCol === 2) {
+                game.board[backRank][3] = game.board[backRank][0];
+                game.board[backRank][0] = null;
+            }
+        }
+
         game.board[move.toRow][move.toCol] = piece;
         game.board[move.fromRow][move.fromCol] = null;
 
-        // Handle pawn promotion (auto-promote to queen)
         if (piece.type === 'pawn' && (move.toRow === 0 || move.toRow === 7)) {
             game.board[move.toRow][move.toCol] = { type: 'queen', color: piece.color };
         }
 
-        // Switch current player for proper move validation during search
-        const opponent = color === 'white' ? 'black' : 'white';
-        game.currentPlayer = opponent;
-
-        let value;
-
-        // Check if game is over or max depth reached
-        if (depth >= this.maxDepth || this.isGameOver(game)) {
-            value = this.evaluatePosition(game, color);
+        if (piece.type === 'pawn' && Math.abs(move.toRow - move.fromRow) === 2) {
+            game.enPassantTarget = {
+                row: (move.toRow + move.fromRow) / 2,
+                col: move.fromCol
+            };
         } else {
-            // Minimax with alpha-beta pruning
-            const opponentMoves = this.getAllPossibleMoves(game, opponent);
-
-            if (opponentMoves.length === 0) {
-                value = this.evaluatePosition(game, color);
-            } else {
-                value = Infinity; // Minimizing for opponent
-
-                for (const opponentMove of opponentMoves) {
-                    const opponentValue = -this.evaluateMove(
-                        game,
-                        opponentMove,
-                        opponent,
-                        depth + 1,
-                        -beta,
-                        -alpha
-                    );
-
-                    value = Math.min(value, opponentValue);
-                    beta = Math.min(beta, value);
-
-                    if (beta <= alpha) {
-                        break; // Alpha-beta pruning
-                    }
-                }
-
-                value = -value;
-            }
+            game.enPassantTarget = null;
         }
 
-        // Restore game state
-        this.restoreGameState(game, savedState);
-        this.positionCount++;
+        if (piece.type === 'king') {
+            game.castlingRights[piece.color].kingside = false;
+            game.castlingRights[piece.color].queenside = false;
+        } else if (piece.type === 'rook') {
+            if (move.fromCol === 0) game.castlingRights[piece.color].queenside = false;
+            if (move.fromCol === 7) game.castlingRights[piece.color].kingside = false;
+        }
 
-        return value;
+        game.currentPlayer = this.getOpponentColor(piece.color);
+    }
+
+    orderMoves(game, moves) {
+        return moves.slice().sort((a, b) => {
+            const aTarget = game.getPiece(a.toRow, a.toCol);
+            const bTarget = game.getPiece(b.toRow, b.toCol);
+            const aScore = aTarget ? this.pieceValues[aTarget.type] : 0;
+            const bScore = bTarget ? this.pieceValues[bTarget.type] : 0;
+            return bScore - aScore;
+        });
+    }
+
+    isTerminal(game, colorToMove) {
+        game.currentPlayer = colorToMove;
+        return !game.hasAnyLegalMoves(colorToMove);
+    }
+
+    getOpponentColor(color) {
+        return color === 'white' ? 'black' : 'white';
     }
 
     /**

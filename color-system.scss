@@ -1,0 +1,63 @@
+// Amira Cloud Color System (SCSS Source)
+// Industrial token naming + semantic aliases + WCAG-friendly defaults.
+
+$color-families: (
+  "brand": (#7dd3fc, #0ea5e9, #0369a1),
+  "secondary": (#a5b4fc, #6366f1, #4338ca),
+  "accent": (#5eead4, #14b8a6, #0f766e),
+  "success": (#86efac, #22c55e, #15803d),
+  "warning": (#fcd34d, #f59e0b, #b45309),
+  "danger": (#fca5a5, #ef4444, #b91c1c),
+  "info": (#93c5fd, #3b82f6, #1d4ed8),
+  "purple": (#c4b5fd, #8b5cf6, #6d28d9),
+  "gold": (#fde68a, #d4af37, #a16207)
+);
+
+@function shade($family, $index) {
+  @return nth(map-get($color-families, $family), $index);
+}
+
+:root {
+  --color-brand-300: #{shade("brand", 1)};
+  --color-brand-500: #{shade("brand", 2)};
+  --color-brand-700: #{shade("brand", 3)};
+
+  --color-secondary-300: #{shade("secondary", 1)};
+  --color-secondary-500: #{shade("secondary", 2)};
+  --color-secondary-700: #{shade("secondary", 3)};
+
+  --color-accent-300: #{shade("accent", 1)};
+  --color-accent-500: #{shade("accent", 2)};
+  --color-accent-700: #{shade("accent", 3)};
+
+  --color-success-300: #{shade("success", 1)};
+  --color-success-500: #{shade("success", 2)};
+  --color-success-700: #{shade("success", 3)};
+
+  --color-warning-300: #{shade("warning", 1)};
+  --color-warning-500: #{shade("warning", 2)};
+  --color-warning-700: #{shade("warning", 3)};
+
+  --color-danger-300: #{shade("danger", 1)};
+  --color-danger-500: #{shade("danger", 2)};
+  --color-danger-700: #{shade("danger", 3)};
+
+  --color-info-300: #{shade("info", 1)};
+  --color-info-500: #{shade("info", 2)};
+  --color-info-700: #{shade("info", 3)};
+
+  --color-purple-300: #{shade("purple", 1)};
+  --color-purple-500: #{shade("purple", 2)};
+  --color-purple-700: #{shade("purple", 3)};
+
+  --color-gold-300: #{shade("gold", 1)};
+  --color-gold-500: #{shade("gold", 2)};
+  --color-gold-700: #{shade("gold", 3)};
+
+  --color-neutral-050: #f8fafc;
+  --color-neutral-100: #f1f5f9;
+  --color-neutral-300: #cbd5e1;
+  --color-neutral-500: #64748b;
+  --color-neutral-700: #334155;
+  --color-neutral-900: #0f172a;
+}

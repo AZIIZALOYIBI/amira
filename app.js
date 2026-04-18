@@ -4,6 +4,10 @@ class ChessUI {
         this.game = new ChessGame();
         this.stats = new ChessStatistics();
         this.openingRecognizer = new OpeningRecognizer();
+        this.achievements = new AchievementsSystem();
+        this.puzzles = new ChessPuzzles();
+        this.moveAnalyzer = new MoveAnalyzer();
+        this.saveSystem = new GameSaveSystem();
         this.auth = new AuthSystem();
         this.roomManager = new RoomManager();
         this.ai = new ChessAI('medium'); // AI engine
@@ -22,6 +26,8 @@ class ChessUI {
         this.playerColor = 'white'; // for computer games
         this.aiDifficulty = 'medium';
         this.isAiThinking = false;
+        this.gameResultRecorded = false;
+        this.gameStartedAt = Date.now();
 
         this.pieceSymbols = {
             white: { king: '♔', queen: '♕', rook: '♖', bishop: '♗', knight: '♘', pawn: '♙' },
@@ -552,6 +558,9 @@ class ChessUI {
     }
 
     init() {
+        this.gameResultRecorded = false;
+        this.gameStartedAt = Date.now();
+
         // Load saved theme
         const savedTheme = localStorage.getItem('chess_theme');
         if (savedTheme) {
@@ -667,7 +676,10 @@ class ChessUI {
                     'saveBtn': () => this.saveGame(),
                     'loadBtn': () => this.loadGame(),
                     'exportBtn': () => this.exportPGN(),
-                    'statsBtn': () => this.showStats()
+                    'statsBtn': () => this.showStats(),
+                    'puzzlesBtn': () => this.showPuzzleModal(),
+                    'achievementsBtn': () => this.showAchievements(),
+                    'analysisBtn': () => this.showAnalysis()
                 };
 
                 if (actions[btnId]) {
@@ -708,13 +720,12 @@ class ChessUI {
         });
         document.getElementById('resetStatsBtn').addEventListener('click', () => {
             if (confirm('هل تريد حذف جميع الإحصائيات؟')) {
-                this.stats.clearStats();
+                this.stats.reset();
                 this.showStats();
             }
         });
 
-        // Add touch support for better mobile experience
-        this.addTouchSupport();
+        this.attachFeatureModalListeners();
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
@@ -889,11 +900,14 @@ class ChessUI {
     }
 
     makeMove(fromRow, fromCol, toRow, toCol) {
+        const whiteCapturedBefore = this.game.capturedPieces.white.length;
+        const blackCapturedBefore = this.game.capturedPieces.black.length;
         const result = this.game.makeMove(fromRow, fromCol, toRow, toCol);
 
         if (result.promotion) {
             this.showPromotionDialog(result.row, result.col);
         } else {
+            this.recordCapturedPiecesDelta(whiteCapturedBefore, blackCapturedBefore);
             this.playSound('move');
             this.renderBoard();
             this.updateGameStatus();
@@ -917,6 +931,7 @@ class ChessUI {
         if (this.isAiThinking || this.game.gameOver) return;
 
         this.isAiThinking = true;
+        this.showAiThinking(true);
         const aiColor = this.playerColor === 'white' ? 'black' : 'white';
 
         // Show thinking indicator
@@ -927,6 +942,9 @@ class ChessUI {
             const bestMove = this.ai.getBestMove(this.game, aiColor);
 
             if (bestMove) {
+                const whiteCapturedBefore = this.game.capturedPieces.white.length;
+                const blackCapturedBefore = this.game.capturedPieces.black.length;
+
                 // Set valid moves for the AI's piece before making the move
                 this.game.validMoves = this.game.getValidMoves(bestMove.fromRow, bestMove.fromCol);
 
@@ -944,12 +962,14 @@ class ChessUI {
                     this.game.saveState();
                 }
 
+                this.recordCapturedPiecesDelta(whiteCapturedBefore, blackCapturedBefore);
                 this.playSound('move');
                 this.renderBoard();
                 this.updateGameStatus();
             }
 
             this.isAiThinking = false;
+            this.showAiThinking(false);
         }, 100);
     }
 
@@ -969,6 +989,7 @@ class ChessUI {
                 this.game.promotePawn(row, col, type);
                 dialog.classList.remove('active');
                 this.game.switchPlayer();
+                this.game.saveState();
                 this.playSound('move');
                 this.renderBoard();
                 this.updateGameStatus();
@@ -1066,6 +1087,10 @@ class ChessUI {
             gameMessageElement.textContent = `كش ملك! فاز ${winner}`;
             this.playSound('checkmate');
             this.stopTimer();
+            if (!this.gameResultRecorded) {
+                const winnerColor = this.game.currentPlayer === 'white' ? 'black' : 'white';
+                this.recordGameResult(winnerColor, 'checkmate');
+            }
             this.showVictory(winner, 'بالكش مات');
         } else if (state === 'check') {
             gameMessageElement.textContent = 'كش!';
@@ -1074,6 +1099,9 @@ class ChessUI {
             gameMessageElement.textContent = 'تعادل - طريق مسدود';
             this.playSound('stalemate');
             this.stopTimer();
+            if (!this.gameResultRecorded) {
+                this.recordGameResult('draw', 'stalemate');
+            }
             this.showVictory('تعادل', 'طريق مسدود');
         } else {
             gameMessageElement.textContent = '';
@@ -1256,6 +1284,10 @@ class ChessUI {
         const winner = player === 'white' ? this.playerNames.black : this.playerNames.white;
         document.getElementById('gameMessage').textContent = `انتهى الوقت! فاز ${winner}`;
         this.game.gameOver = true;
+        if (!this.gameResultRecorded) {
+            const winnerColor = player === 'white' ? 'black' : 'white';
+            this.recordGameResult(winnerColor, 'timeout');
+        }
         this.showVictory(winner, 'بانتهاء الوقت');
     }
 
@@ -1275,6 +1307,8 @@ class ChessUI {
 
     resetGame() {
         this.game.reset();
+        this.gameResultRecorded = false;
+        this.gameStartedAt = Date.now();
         this.selectedSquare = null;
         // Reset timers based on current game mode
         const timers = {
@@ -1294,6 +1328,232 @@ class ChessUI {
         this.renderBoard();
         this.updateGameStatus();
         this.updateTimerDisplay();
+    }
+
+    showAiThinking(show) {
+        const indicator = document.getElementById('aiThinkingIndicator');
+        if (indicator) {
+            indicator.style.display = show ? 'block' : 'none';
+        }
+    }
+
+    recordCapturedPiecesDelta(whiteBefore, blackBefore) {
+        if (this.game.capturedPieces.white.length > whiteBefore) {
+            const captured = this.game.capturedPieces.white[this.game.capturedPieces.white.length - 1];
+            if (captured?.type) this.stats.recordCapture(captured.type);
+        }
+        if (this.game.capturedPieces.black.length > blackBefore) {
+            const captured = this.game.capturedPieces.black[this.game.capturedPieces.black.length - 1];
+            if (captured?.type) this.stats.recordCapture(captured.type);
+        }
+    }
+
+    getLocalPlayerColor() {
+        if (this.gameType === 'computer') {
+            return this.playerColor;
+        }
+        return null;
+    }
+
+    recordGameResult(winnerColorOrDraw, reason) {
+        const localPlayerColor = this.getLocalPlayerColor();
+        const totalMoves = this.game.moveHistory.length;
+        const playTime = Math.max(1, Math.floor((Date.now() - this.gameStartedAt) / 1000));
+
+        const baseExtra = {
+            playTime,
+            vsAI: this.gameType === 'computer',
+            aiDifficulty: this.gameType === 'computer' ? this.aiDifficulty : null
+        };
+
+        if (winnerColorOrDraw === 'draw') {
+            const colorForStats = localPlayerColor || 'white';
+            this.stats.recordGame('draw', totalMoves, colorForStats, reason, baseExtra);
+        } else if (localPlayerColor) {
+            const isWin = winnerColorOrDraw === localPlayerColor;
+            this.stats.recordGame(
+                isWin ? 'win' : 'loss',
+                totalMoves,
+                localPlayerColor,
+                reason,
+                baseExtra
+            );
+        } else {
+            // Local 2-player game: record winner color as a win in color statistics.
+            this.stats.recordGame('win', totalMoves, winnerColorOrDraw, reason, baseExtra);
+        }
+
+        const newlyUnlocked = this.achievements.checkAchievements(this.stats.getStats());
+        newlyUnlocked.forEach((achievement) => this.showAchievementNotification(achievement));
+        this.gameResultRecorded = true;
+    }
+
+    showAchievementNotification(achievement) {
+        const notification = document.getElementById('achievementNotification');
+        const icon = document.getElementById('notificationIcon');
+        const text = document.getElementById('notificationText');
+        if (!notification || !icon || !text || !achievement) return;
+
+        icon.textContent = achievement.icon || '🏆';
+        text.textContent = `${achievement.name}: ${achievement.description}`;
+        notification.style.display = 'block';
+
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 3500);
+    }
+
+    attachFeatureModalListeners() {
+        const closePuzzlesBtn = document.getElementById('closePuzzlesBtn');
+        if (closePuzzlesBtn) {
+            closePuzzlesBtn.addEventListener('click', () => {
+                document.getElementById('puzzlesModal').classList.remove('active');
+            });
+        }
+
+        const closeAchievementsBtn = document.getElementById('closeAchievementsBtn');
+        if (closeAchievementsBtn) {
+            closeAchievementsBtn.addEventListener('click', () => {
+                document.getElementById('achievementsModal').classList.remove('active');
+            });
+        }
+
+        const closeAnalysisBtn = document.getElementById('closeAnalysisBtn');
+        if (closeAnalysisBtn) {
+            closeAnalysisBtn.addEventListener('click', () => {
+                document.getElementById('analysisModal').classList.remove('active');
+            });
+        }
+
+        const dailyPuzzleBtn = document.getElementById('dailyPuzzleBtn');
+        if (dailyPuzzleBtn) {
+            dailyPuzzleBtn.addEventListener('click', () => this.renderPuzzle(this.puzzles.getDailyPuzzle()));
+        }
+        const randomPuzzleBtn = document.getElementById('randomPuzzleBtn');
+        if (randomPuzzleBtn) {
+            randomPuzzleBtn.addEventListener('click', () => this.renderPuzzle(this.puzzles.getRandomPuzzle()));
+        }
+        const puzzleHintBtn = document.getElementById('puzzleHintBtn');
+        if (puzzleHintBtn) {
+            puzzleHintBtn.addEventListener('click', () => {
+                const hint = this.puzzles.getHint();
+                if (hint) alert(`💡 ${hint}`);
+            });
+        }
+    }
+
+    showPuzzleModal() {
+        this.renderPuzzle(this.puzzles.getDailyPuzzle());
+        document.getElementById('puzzlesModal').classList.add('active');
+    }
+
+    renderPuzzle(puzzle) {
+        if (!puzzle) return;
+        const titleEl = document.getElementById('puzzleTitle');
+        const difficultyEl = document.getElementById('puzzleDifficulty');
+        const descriptionEl = document.getElementById('puzzleDescription');
+        const solvedEl = document.getElementById('puzzlesSolvedCount');
+        const streakEl = document.getElementById('puzzleStreak');
+
+        const stats = this.puzzles.getStats();
+        titleEl.textContent = `لغز #${puzzle.id}`;
+        difficultyEl.textContent = puzzle.difficulty;
+        descriptionEl.textContent = `${puzzle.description} - الحل: ${puzzle.solution.join(' ')}`;
+        solvedEl.textContent = stats.totalSolved;
+        streakEl.textContent = stats.currentStreak;
+    }
+
+    showAchievements() {
+        const modal = document.getElementById('achievementsModal');
+        const grid = document.getElementById('achievementsGrid');
+        const progressText = document.getElementById('achievementsProgress');
+        const progressBar = document.getElementById('achievementsProgressBar');
+        if (!modal || !grid || !progressText || !progressBar) return;
+
+        const progress = this.achievements.getProgress();
+        const unlockedIds = new Set(this.achievements.achievements.unlocked);
+        progressText.textContent = `${progress.unlocked}/${progress.total}`;
+        progressBar.style.width = `${progress.percentage}%`;
+
+        grid.innerHTML = this.achievements.definitions.map((achievement) => {
+            const unlocked = unlockedIds.has(achievement.id);
+            return `
+                <div class="achievement-card ${unlocked ? 'unlocked' : 'locked'}">
+                    <span class="achievement-icon">${achievement.icon}</span>
+                    <div class="achievement-name">${achievement.name}</div>
+                    <div class="achievement-description">${achievement.description}</div>
+                </div>
+            `;
+        }).join('');
+
+        modal.classList.add('active');
+    }
+
+    showAnalysis() {
+        const modal = document.getElementById('analysisModal');
+        const positionEval = document.getElementById('positionEval');
+        const lastMoveAnalysis = document.getElementById('lastMoveAnalysis');
+        const moveSuggestions = document.getElementById('moveSuggestions');
+        if (!modal || !positionEval || !lastMoveAnalysis || !moveSuggestions) return;
+
+        const evalResult = this.moveAnalyzer.evaluatePosition(this.game);
+        positionEval.innerHTML = `
+            <div class="stat-item">
+                <span class="stat-label">الأبيض</span>
+                <span class="stat-value">${evalResult.white}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">الأسود</span>
+                <span class="stat-value">${evalResult.black}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">أفضلية</span>
+                <span class="stat-value">${evalResult.advantageText}</span>
+            </div>
+        `;
+
+        const lastMove = this.game.moveHistory[this.game.moveHistory.length - 1];
+        if (lastMove) {
+            const moveAnalysis = this.moveAnalyzer.analyzeMove(this.game, lastMove);
+            lastMoveAnalysis.innerHTML = `
+                <span class="move-badge ${moveAnalysis.quality}">${moveAnalysis.quality}</span>
+                <p>${moveAnalysis.description || 'لا يوجد وصف متاح'}</p>
+            `;
+        } else {
+            lastMoveAnalysis.innerHTML = '<p>لا توجد حركات بعد.</p>';
+        }
+
+        const suggestions = this.moveAnalyzer.suggestBetterMoves(this.game);
+        if (suggestions.length) {
+            moveSuggestions.innerHTML = suggestions.map((suggestion) => {
+                const files = 'abcdefgh';
+                const from = files[suggestion.from.col] + (8 - suggestion.from.row);
+                const to = files[suggestion.to.col] + (8 - suggestion.to.row);
+                return `
+                    <div class="suggestion-item">
+                        ${from} → ${to} (${suggestion.evaluation})
+                    </div>
+                `;
+            }).join('');
+        } else {
+            moveSuggestions.innerHTML = '<p>لا توجد اقتراحات قوية حالياً.</p>';
+        }
+
+        modal.classList.add('active');
+    }
+
+    exportStats() {
+        const statsText = this.stats.exportStats();
+        const blob = new Blob([statsText], { type: 'text/plain; charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `amira-stats-${Date.now()}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        alert('✅ تم تصدير الإحصائيات!');
     }
 
     undoMove() {

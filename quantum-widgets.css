@@ -1,0 +1,155 @@
+/* ============================================================
+ * Amira · Quantum Widgets
+ * Eval Bar · Material Differential · Theme Toggle
+ * ============================================================ */
+
+/* ---------- Theme toggle button ---------- */
+.q-theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--q-border-strong);
+    background: var(--q-surface-2);
+    color: var(--q-text);
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out-quant),
+                box-shadow var(--dur-fast) var(--ease-out-quant),
+                transform var(--dur-fast) var(--ease-out-quant);
+    backdrop-filter: blur(8px);
+}
+.q-theme-toggle:hover {
+    background: var(--q-surface-3);
+    box-shadow: var(--q-glow);
+    transform: translateY(-1px);
+}
+.q-theme-toggle:focus-visible {
+    outline: 2px solid var(--q-accent);
+    outline-offset: 2px;
+}
+.q-theme-toggle .q-theme-icon {
+    width: 18px; height: 18px;
+    display: inline-grid; place-items: center;
+    font-size: 1rem;
+}
+.q-theme-toggle .q-theme-label { font-weight: 600; }
+
+.header-user-bar { gap: 10px; }
+
+/* ---------- Eval Bar ---------- */
+.q-eval-bar {
+    position: relative;
+    width: 22px;
+    min-height: 320px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #1a1613 0%, #2a221c 50%, #f3ece1 50%, #e9dcc5 100%);
+    box-shadow: var(--q-shadow-1), inset 0 0 0 1px var(--q-border);
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.q-eval-bar__fill {
+    position: absolute;
+    left: 0; right: 0;
+    top: 50%;
+    height: 0%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(235, 219, 188, 0.85));
+    transition: top 420ms var(--ease-out-quant), height 420ms var(--ease-out-quant);
+    box-shadow: 0 0 18px rgba(255, 240, 210, 0.35);
+}
+.q-eval-bar__fill--neg {
+    background: linear-gradient(180deg, rgba(26, 22, 19, 0.95), rgba(58, 44, 34, 0.9));
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.45);
+}
+
+.q-eval-bar__midline {
+    position: absolute;
+    left: -3px; right: -3px;
+    top: 50%;
+    height: 2px;
+    background: var(--q-accent);
+    transform: translateY(-1px);
+    box-shadow: 0 0 8px var(--q-accent);
+    pointer-events: none;
+}
+
+.q-eval-bar__value {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--q-text);
+    background: var(--q-surface-3);
+    border: 1px solid var(--q-border-strong);
+    padding: 2px 6px;
+    border-radius: 6px;
+    pointer-events: none;
+    min-width: 34px;
+    text-align: center;
+    box-shadow: var(--q-shadow-1);
+    font-variant-numeric: tabular-nums;
+}
+
+.q-eval-wrap {
+    display: flex;
+    align-items: stretch;
+    gap: 14px;
+}
+
+@media (max-width: 900px) {
+    .q-eval-bar { min-height: 220px; width: 18px; }
+    .q-eval-bar__value { font-size: 0.65rem; }
+}
+
+/* ---------- Material differential pill ---------- */
+.q-material-diff {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 22px;
+    margin-inline-start: 10px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--q-surface-2);
+    border: 1px solid var(--q-border);
+    color: var(--q-accent);
+    font-weight: 800;
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    transition: opacity var(--dur-base) var(--ease-out-quant),
+                transform var(--dur-base) var(--ease-out-quant);
+}
+.q-material-diff[data-sign="pos"] { color: #2f9e6b; border-color: rgba(47, 158, 107, 0.35); }
+.q-material-diff[data-sign="neg"] { color: #c63427; border-color: rgba(198, 52, 39, 0.35); }
+.q-material-diff[data-sign="zero"] { opacity: 0.5; }
+
+/* ---------- Focus ring for keyboard nav on board ---------- */
+.chess-board .square.q-focus {
+    outline: 3px solid var(--q-accent);
+    outline-offset: -3px;
+    z-index: 2;
+}
+
+/* ---------- Skip link ---------- */
+.q-skip-link {
+    position: absolute;
+    left: 12px; top: 12px;
+    transform: translateY(-200%);
+    background: var(--q-accent);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    z-index: 10000;
+    transition: transform 180ms var(--ease-out-quant);
+    text-decoration: none;
+    font-weight: 700;
+}
+.q-skip-link:focus { transform: translateY(0); }

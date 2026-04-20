@@ -6,12 +6,25 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#667eea">
+    <meta name="theme-color" content="#181614">
     <meta name="description" content="Amira Chess — تجربة شطرنج عصرية باللغة العربية مع واجهة مستخدم فاخرة ودعم كامل للجوال">
-    <meta name="color-scheme" content="dark">
+    <meta name="color-scheme" content="dark light">
     <title>لعبة الشطرنج - Amira Chess</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" type="image/svg+xml" href="icons/icon-192.svg">
+    <link rel="apple-touch-icon" href="icons/icon-192.svg">
+
+    <!-- Early theme application to prevent FOUC -->
+    <script src="quantum-theme.js"></script>
+
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="color-system.css">
+    <link rel="stylesheet" href="theme-quantum.css">
+    <link rel="stylesheet" href="theme-quantum-apply.css">
+    <link rel="stylesheet" href="quantum-3d.css">
+    <link rel="stylesheet" href="quantum-widgets.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -455,5 +468,10 @@
     <script src="ai.js"></script>
     <script src="statistics.js"></script>
     <script src="app.js"></script>
+
+    <!-- Quantum Layer -->
+    <script src="quantum-widgets.js" defer></script>
+    <script src="quantum-keyboard.js" defer></script>
+    <script src="quantum-sw-register.js" defer></script>
 </body>
 </html>

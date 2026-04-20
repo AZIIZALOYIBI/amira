@@ -1,0 +1,136 @@
+/* ============================================================
+ * Amira · Quantum Theme Layer (Claude Creative Palette)
+ * ------------------------------------------------------------
+ * Top-level token layer loaded AFTER styles.css so it can
+ * selectively override the legacy variables without a rewrite.
+ *
+ * Palette source: Claude brand — Clay #DA7756, Cream #EBDBBC,
+ * warm charcoal, soft ivory. Tuned for WCAG AA on both modes.
+ * ============================================================ */
+
+:root {
+    /* Claude primitive palette */
+    --claude-clay-50:  #fff4ee;
+    --claude-clay-100: #ffe3d2;
+    --claude-clay-200: #ffc9ad;
+    --claude-clay-300: #f9a883;
+    --claude-clay-400: #ea8862;
+    --claude-clay-500: #da7756;  /* brand */
+    --claude-clay-600: #b85b3d;
+    --claude-clay-700: #93462e;
+    --claude-clay-800: #703422;
+    --claude-clay-900: #4a2216;
+
+    --claude-cream-50:  #fbf7f0;
+    --claude-cream-100: #f4ecdc;
+    --claude-cream-200: #ebdbbc;  /* brand */
+    --claude-cream-300: #d9c59a;
+    --claude-cream-400: #c4ad7a;
+
+    --claude-ink-50:  #f7f3ee;
+    --claude-ink-100: #e8e1d6;
+    --claude-ink-300: #9d9488;
+    --claude-ink-500: #635a4e;
+    --claude-ink-700: #3a342b;
+    --claude-ink-800: #262220;
+    --claude-ink-900: #181614;
+    --claude-ink-950: #0f0d0b;
+
+    /* Motion & shape tokens */
+    --radius-xs: 6px;
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+    --ease-out-quant: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-in-out-quant: cubic-bezier(0.65, 0, 0.35, 1);
+    --dur-fast: 160ms;
+    --dur-base: 280ms;
+    --dur-slow: 520ms;
+}
+
+/* ---------- DARK MODE (default for backwards compat) ---------- */
+:root,
+[data-theme="dark"] {
+    --q-bg-0: radial-gradient(1200px 600px at 80% -10%, #3a2418 0%, transparent 60%),
+              radial-gradient(900px 500px at -10% 110%, #1a1512 0%, transparent 55%),
+              linear-gradient(160deg, #14110e 0%, #1c1815 55%, #221c17 100%);
+    --q-surface-1: rgba(255, 243, 230, 0.04);
+    --q-surface-2: rgba(255, 243, 230, 0.07);
+    --q-surface-3: rgba(255, 243, 230, 0.10);
+    --q-border:    rgba(255, 214, 178, 0.14);
+    --q-border-strong: rgba(255, 214, 178, 0.28);
+    --q-text:      #f3ece1;
+    --q-text-muted:#bcb0a0;
+    --q-text-soft: #8a8276;
+    --q-accent:    var(--claude-clay-400);
+    --q-accent-2:  var(--claude-clay-500);
+    --q-accent-3:  var(--claude-cream-200);
+    --q-glow:      0 0 24px rgba(234, 136, 98, 0.28);
+    --q-shadow-1:  0 6px 22px rgba(0, 0, 0, 0.45), 0 1px 4px rgba(0, 0, 0, 0.25);
+    --q-shadow-2:  0 14px 44px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.35);
+
+    --q-square-light: #ebdbbc;
+    --q-square-dark:  #8b5a3c;
+    --q-square-highlight: rgba(234, 136, 98, 0.45);
+    --q-square-valid: rgba(234, 136, 98, 0.58);
+    --q-square-last:  rgba(255, 223, 128, 0.30);
+    --q-check:        #e05a48;
+}
+
+/* ---------- LIGHT MODE ---------- */
+[data-theme="light"] {
+    --q-bg-0: radial-gradient(1200px 600px at 80% -10%, #ffd9bf 0%, transparent 60%),
+              radial-gradient(900px 500px at -10% 110%, #fff0dc 0%, transparent 60%),
+              linear-gradient(160deg, #fbf6ee 0%, #f6ebd9 55%, #f1dec3 100%);
+    --q-surface-1: rgba(255, 255, 255, 0.55);
+    --q-surface-2: rgba(255, 255, 255, 0.75);
+    --q-surface-3: rgba(255, 255, 255, 0.88);
+    --q-border:    rgba(140, 90, 60, 0.18);
+    --q-border-strong: rgba(140, 90, 60, 0.32);
+    --q-text:      #2b2520;
+    --q-text-muted:#5f564b;
+    --q-text-soft: #8a8276;
+    --q-accent:    var(--claude-clay-600);
+    --q-accent-2:  var(--claude-clay-500);
+    --q-accent-3:  var(--claude-ink-700);
+    --q-glow:      0 0 22px rgba(218, 119, 86, 0.22);
+    --q-shadow-1:  0 6px 20px rgba(138, 90, 50, 0.14), 0 1px 3px rgba(138, 90, 50, 0.10);
+    --q-shadow-2:  0 14px 40px rgba(138, 90, 50, 0.20), 0 4px 10px rgba(138, 90, 50, 0.14);
+
+    --q-square-light: #fbf1df;
+    --q-square-dark:  #d89a6f;
+    --q-square-highlight: rgba(218, 119, 86, 0.40);
+    --q-square-valid: rgba(218, 119, 86, 0.55);
+    --q-square-last:  rgba(255, 193, 107, 0.45);
+    --q-check:        #c63427;
+}
+
+/* ---------- AUTO MODE via system preference ---------- */
+@media (prefers-color-scheme: light) {
+    [data-theme="auto"] {
+        --q-bg-0: radial-gradient(1200px 600px at 80% -10%, #ffd9bf 0%, transparent 60%),
+                  radial-gradient(900px 500px at -10% 110%, #fff0dc 0%, transparent 60%),
+                  linear-gradient(160deg, #fbf6ee 0%, #f6ebd9 55%, #f1dec3 100%);
+        --q-surface-1: rgba(255, 255, 255, 0.55);
+        --q-surface-2: rgba(255, 255, 255, 0.75);
+        --q-surface-3: rgba(255, 255, 255, 0.88);
+        --q-border:    rgba(140, 90, 60, 0.18);
+        --q-border-strong: rgba(140, 90, 60, 0.32);
+        --q-text:      #2b2520;
+        --q-text-muted:#5f564b;
+        --q-text-soft: #8a8276;
+        --q-accent:    var(--claude-clay-600);
+        --q-accent-2:  var(--claude-clay-500);
+        --q-accent-3:  var(--claude-ink-700);
+        --q-glow:      0 0 22px rgba(218, 119, 86, 0.22);
+        --q-shadow-1:  0 6px 20px rgba(138, 90, 50, 0.14), 0 1px 3px rgba(138, 90, 50, 0.10);
+        --q-shadow-2:  0 14px 40px rgba(138, 90, 50, 0.20), 0 4px 10px rgba(138, 90, 50, 0.14);
+        --q-square-light: #fbf1df;
+        --q-square-dark:  #d89a6f;
+        --q-square-highlight: rgba(218, 119, 86, 0.40);
+        --q-square-valid: rgba(218, 119, 86, 0.55);
+        --q-square-last:  rgba(255, 193, 107, 0.45);
+        --q-check:        #c63427;
+    }
+}

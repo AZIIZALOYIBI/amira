@@ -129,9 +129,9 @@ class ChessAI {
         }
 
         let bestMove = allMoves[0];
-        let bestValue = -Infinity;
-        let alpha = -Infinity;
-        const beta = Infinity;
+        let bestValue = -1000000;
+        let alpha = -1000000;
+        const beta = 1000000;
 
         for (const move of allMoves) {
             const stateBeforeMove = this.saveGameState(game);
@@ -166,19 +166,26 @@ class ChessAI {
         const currentColor = maximizingPlayer ? aiColor : this.getOpponentColor(aiColor);
         game.currentPlayer = currentColor;
 
-        if (depth === 0 || this.isTerminal(game, currentColor)) {
-            return this.evaluatePosition(game, aiColor);
+        if (depth === 0) {
+            return this.evaluatePositionFast(game, aiColor);
         }
 
         let moves = this.getAllPossibleMoves(game, currentColor);
-        moves = this.orderMoves(game, moves);
 
         if (moves.length === 0) {
-            return this.evaluatePosition(game, aiColor);
+            if (game.isInCheck(currentColor)) {
+                // Checkmate
+                return maximizingPlayer ? -1000000 - depth : 1000000 + depth;
+            } else {
+                // Stalemate
+                return 0;
+            }
         }
 
+        moves = this.orderMoves(game, moves);
+
         if (maximizingPlayer) {
-            let maxEval = -Infinity;
+            let maxEval = -1000000;
             for (const move of moves) {
                 const savedState = this.saveGameState(game);
                 this.applyMove(game, move);
@@ -192,7 +199,7 @@ class ChessAI {
             return maxEval;
         }
 
-        let minEval = Infinity;
+        let minEval = 1000000;
         for (const move of moves) {
             const savedState = this.saveGameState(game);
             this.applyMove(game, move);
@@ -261,8 +268,29 @@ class ChessAI {
         return moves.slice().sort((a, b) => {
             const aTarget = game.getPiece(a.toRow, a.toCol);
             const bTarget = game.getPiece(b.toRow, b.toCol);
-            const aScore = aTarget ? this.pieceValues[aTarget.type] : 0;
-            const bScore = bTarget ? this.pieceValues[bTarget.type] : 0;
+            
+            let aScore = 0;
+            let bScore = 0;
+
+            if (aTarget) {
+                const aAttacker = game.getPiece(a.fromRow, a.fromCol);
+                aScore = 10 * this.pieceValues[aTarget.type] - (aAttacker ? this.pieceValues[aAttacker.type] : 0);
+            }
+            if (bTarget) {
+                const bAttacker = game.getPiece(b.fromRow, b.fromCol);
+                bScore = 10 * this.pieceValues[bTarget.type] - (bAttacker ? this.pieceValues[bAttacker.type] : 0);
+            }
+
+            // Prioritize pawn promotions
+            if (a.toRow === 0 || a.toRow === 7) {
+                const p = game.getPiece(a.fromRow, a.fromCol);
+                if (p && p.type === 'pawn') aScore += 9000;
+            }
+            if (b.toRow === 0 || b.toRow === 7) {
+                const p = game.getPiece(b.fromRow, b.fromCol);
+                if (p && p.type === 'pawn') bScore += 9000;
+            }
+
             return bScore - aScore;
         });
     }
@@ -277,23 +305,10 @@ class ChessAI {
     }
 
     /**
-     * Evaluate the current board position
+     * Evaluate the current board position without checking for mate
      */
-    evaluatePosition(game, color) {
+    evaluatePositionFast(game, color) {
         let score = 0;
-
-        // Check for checkmate or stalemate
-        if (this.isCheckmate(game, color)) {
-            return -Infinity;
-        }
-        if (this.isCheckmate(game, color === 'white' ? 'black' : 'white')) {
-            return Infinity;
-        }
-        if (this.isStalemate(game)) {
-            return 0;
-        }
-
-        // Evaluate material and position
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
                 const piece = game.getPiece(row, col);
@@ -310,8 +325,25 @@ class ChessAI {
                 }
             }
         }
-
         return score;
+    }
+
+    /**
+     * Evaluate the current board position
+     */
+    evaluatePosition(game, color) {
+        // Check for checkmate or stalemate
+        if (this.isCheckmate(game, color)) {
+            return -1000000;
+        }
+        if (this.isCheckmate(game, color === 'white' ? 'black' : 'white')) {
+            return 1000000;
+        }
+        if (this.isStalemate(game)) {
+            return 0;
+        }
+
+        return this.evaluatePositionFast(game, color);
     }
 
     /**
@@ -386,24 +418,43 @@ class ChessAI {
     }
 
     /**
-     * Save game state for undo
+     * Save game state for undo (Optimized)
      */
     saveGameState(game) {
+        const boardCopy = new Array(8);
+        for (let r = 0; r < 8; r++) {
+            boardCopy[r] = new Array(8);
+            for (let c = 0; c < 8; c++) {
+                const p = game.board[r][c];
+                boardCopy[r][c] = p ? { type: p.type, color: p.color } : null;
+            }
+        }
         return {
-            board: JSON.parse(JSON.stringify(game.board)),
+            board: boardCopy,
             currentPlayer: game.currentPlayer,
-            enPassantTarget: game.enPassantTarget ? {...game.enPassantTarget} : null,
-            castlingRights: JSON.parse(JSON.stringify(game.castlingRights))
+            enPassantTarget: game.enPassantTarget ? { row: game.enPassantTarget.row, col: game.enPassantTarget.col } : null,
+            castlingRights: {
+                white: { kingside: game.castlingRights.white.kingside, queenside: game.castlingRights.white.queenside },
+                black: { kingside: game.castlingRights.black.kingside, queenside: game.castlingRights.black.queenside }
+            }
         };
     }
 
     /**
-     * Restore game state
+     * Restore game state (Optimized)
      */
     restoreGameState(game, state) {
-        game.board = JSON.parse(JSON.stringify(state.board));
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                const p = state.board[r][c];
+                game.board[r][c] = p ? { type: p.type, color: p.color } : null;
+            }
+        }
         game.currentPlayer = state.currentPlayer;
-        game.enPassantTarget = state.enPassantTarget ? {...state.enPassantTarget} : null;
-        game.castlingRights = JSON.parse(JSON.stringify(state.castlingRights));
+        game.enPassantTarget = state.enPassantTarget ? { row: state.enPassantTarget.row, col: state.enPassantTarget.col } : null;
+        game.castlingRights.white.kingside = state.castlingRights.white.kingside;
+        game.castlingRights.white.queenside = state.castlingRights.white.queenside;
+        game.castlingRights.black.kingside = state.castlingRights.black.kingside;
+        game.castlingRights.black.queenside = state.castlingRights.black.queenside;
     }
 }
